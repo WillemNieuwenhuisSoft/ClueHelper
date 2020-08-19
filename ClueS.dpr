@@ -7,8 +7,7 @@ uses
   IlwisMap in 'IlwisMap.pas',
   ClueTypes in 'ClueTypes.pas',
   AscToIlwis in 'AscToIlwis.pas',
-  CluesConfig in 'CluesConfig.pas',
-  SelectFolder in 'SelectFolder.pas' {selectFolderForm};
+  CluesConfig in 'CluesConfig.pas';
 
 {$R *.res}
 
@@ -16,6 +15,5 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TClueForm, ClueForm);
-  Application.CreateForm(TselectFolderForm, selectFolderForm);
   Application.Run;
 end.

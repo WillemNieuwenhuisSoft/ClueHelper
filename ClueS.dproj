@@ -133,10 +133,6 @@
         <DCCReference Include="ClueTypes.pas"/>
         <DCCReference Include="AscToIlwis.pas"/>
         <DCCReference Include="CluesConfig.pas"/>
-        <DCCReference Include="SelectFolder.pas">
-            <Form>selectFolderForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

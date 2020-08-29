@@ -85,13 +85,17 @@ begin
 end;
 
 procedure TClueForm.Btn_UpdateClick(Sender: TObject);
+var
+    ic : TImageConvertor;
 begin
     saveConfig;
 
     Btn_Close.Enabled := false;
 
+    ic := TImageConvertor.Create(self.Handle);
     try
         progressConvertMove.Visible := true;
+        ic.convertAll;
         // start thread
 //        _thread := TImageConvertor.Create(self.Handle);
 //        _thread_handle := _thread.Handle;

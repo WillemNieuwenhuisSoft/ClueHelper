@@ -37,10 +37,10 @@ type
         constructor Create(configname : string);
         destructor Destroy; override;
 
-        function getNextScenarioFolder : string;
+        function getScenarioFolder : string;
 
         property configname : string read _name write _name;
-//        property source : string read _sourcePath write _sourcePath;
+        property sourceFolder : string read _sourcePath write _sourcePath;
 //        property basePath : string read _basePath write _basePath;
 //        property folderPattern : string read _folderPattern write _folderPattern;
         property startNum : string read getStartNum write setStartNum;
@@ -116,9 +116,9 @@ var
         _changed := false;
     end;
 
-	function TCluesConfig.getNextScenarioFolder: string;
+	function TCluesConfig.getScenarioFolder: string;
     begin
-
+        Result := ExpandFileName(getPattern(_folderPattern, _startNum));
     end;
 
 	destructor TCluesConfig.Destroy;
@@ -131,19 +131,7 @@ var
 
     function TCluesConfig.getDestPath : string;
     begin
-//		String dir = getPattern(folderPattern, startNum);
-//		String ex = basePath;
-//		if (ex.length() > 0)
-//			ex += File.separator;
-//		if (dir.length() > 0)
-//			ex += dir;
-//		if (ex.length() == 0) {
-//			// logger.severe("Destination folder for scenario files not valid, abort operation");
-//			return ""; // should not happen
-//		}
-//
-//		return ex;
-//	}
+        getDestPath := ExpandFileName(getPattern(_folderPattern, _startNum));
     end;
 
     function TCluesConfig.getProperty(key : string) : string;

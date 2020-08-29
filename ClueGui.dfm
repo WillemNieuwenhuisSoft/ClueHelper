@@ -12,6 +12,7 @@ object ClueForm: TClueForm
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
+  OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 16
   object buttonPanel: TPanel
@@ -41,6 +42,18 @@ object ClueForm: TClueForm
       Caption = 'Convert && Move'
       TabOrder = 1
       OnClick = Btn_UpdateClick
+    end
+    object progressConvertMove: TProgressBar
+      Left = 24
+      Top = 6
+      Width = 100
+      Height = 19
+      Smooth = True
+      MarqueeInterval = 2
+      BarColor = clRed
+      Step = 1
+      TabOrder = 2
+      Visible = False
     end
   end
   object mainPanel: TPanel
@@ -191,6 +204,16 @@ object ClueForm: TClueForm
       RightButton.Visible = True
       TabOrder = 6
       TextHint = 'Select an ILWIS georeference object'
+    end
+    object styleChooser: TComboBox
+      Left = 416
+      Top = 192
+      Width = 145
+      Height = 24
+      Anchors = [akRight]
+      TabOrder = 7
+      Text = 'styleChooser'
+      OnChange = changeStyleClick
     end
   end
   object arrowImages: TImageList
@@ -473,13 +496,6 @@ object ClueForm: TClueForm
     Images = arrowImages
     Left = 72
     Top = 184
-    object folder11: TMenuItem
-      Caption = 'folder1'
-      ImageIndex = 1
-    end
-    object folder21: TMenuItem
-      Caption = 'folder2'
-    end
   end
   object mainEvents: TApplicationEvents
     OnActivate = mainEventsActivate
@@ -491,38 +507,17 @@ object ClueForm: TClueForm
     Images = arrowImages
     Left = 120
     Top = 184
-    object MenuItem1: TMenuItem
-      Caption = 'folder1'
-      ImageIndex = 1
-    end
-    object MenuItem2: TMenuItem
-      Caption = 'folder2'
-    end
   end
   object domainsMenu: TPopupMenu
     AutoHotkeys = maManual
     Images = arrowImages
     Left = 160
     Top = 184
-    object MenuItem3: TMenuItem
-      Caption = 'folder1'
-      ImageIndex = 1
-    end
-    object MenuItem4: TMenuItem
-      Caption = 'folder2'
-    end
   end
   object georefsMenu: TPopupMenu
     AutoHotkeys = maManual
     Images = arrowImages
     Left = 208
     Top = 184
-    object MenuItem5: TMenuItem
-      Caption = 'folder1'
-      ImageIndex = 1
-    end
-    object MenuItem6: TMenuItem
-      Caption = 'folder2'
-    end
   end
 end

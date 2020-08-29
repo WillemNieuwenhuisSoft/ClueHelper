@@ -7,7 +7,11 @@ uses
   IlwisMap in 'IlwisMap.pas',
   ClueTypes in 'ClueTypes.pas',
   AscToIlwis in 'AscToIlwis.pas',
-  CluesConfig in 'CluesConfig.pas';
+  CluesConfig in 'CluesConfig.pas',
+  MoveScenarioFiles in 'MoveScenarioFiles.pas',
+  ImageConvertor in 'ImageConvertor.pas',
+  Vcl.Themes,
+  Vcl.Styles;
 
 {$R *.res}
 

@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.AppAnalytics, System.Actions, Vcl.ActnList, System.ImageList, Vcl.ImgList,
-  Vcl.Menus, Vcl.AppEvnts, Vcl.Mask;
+  Vcl.Menus, Vcl.AppEvnts, Vcl.Mask, Vcl.ComCtrls, System.Win.TaskbarCore,
+  Vcl.Taskbar, ShlObj, imageconvertor, cluetypes;
 
 type
   TClueForm = class(TForm)
@@ -26,28 +27,30 @@ type
     cluefolderEdit: TButtonedEdit;
     arrowImages: TImageList;
     cluefolderListMenu: TPopupMenu;
-    folder11: TMenuItem;
-    folder21: TMenuItem;
     mainEvents: TApplicationEvents;
     processedFolderListMenu: TPopupMenu;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
     basefolderEdit: TButtonedEdit;
     domainBEdit: TButtonedEdit;
     domainsMenu: TPopupMenu;
-    MenuItem3: TMenuItem;
-    MenuItem4: TMenuItem;
     georefsMenu: TPopupMenu;
-    MenuItem5: TMenuItem;
-    MenuItem6: TMenuItem;
     georefBEdit: TButtonedEdit;
+    progressConvertMove: TProgressBar;
+    styleChooser: TComboBox;
     procedure Btn_CloseClick(Sender: TObject);
     procedure Btn_UpdateClick(Sender: TObject);
     procedure buttonPanelResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure mainEventsActivate(Sender: TObject);
+    procedure changeStyleClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
   private
     { Private declarations }
+    TaskBarNative: ITaskBarList3;
+    _thread : TImageConvertor;
+    _thread_handle : THandle;
+
+    procedure HandleThreadResult(var Message: TUMWorkerDone); message UM_WORKERDONE;
+    procedure HandleThreadProgress(var Message: TUMWorkerProgress); message UM_WORKERPROGRESS;
 
     procedure saveConfig;
     procedure saveSpecialTEdit(parent: TWinControl);
@@ -71,7 +74,9 @@ implementation
 {$R *.dfm}
 
 uses
-    system.types, ioutils, AscFile, IlwisMap, CluesConfig;
+    Registry, ShellApi, ComObj,
+    themes, styles, system.types, ioutils,
+    CluesConfig;
 
 procedure TClueForm.Btn_CloseClick(Sender: TObject);
 begin
@@ -82,7 +87,37 @@ end;
 procedure TClueForm.Btn_UpdateClick(Sender: TObject);
 begin
     saveConfig;
-// TODO: start the file convert and copy
+
+    Btn_Close.Enabled := false;
+
+    try
+        progressConvertMove.Visible := true;
+        // start thread
+//        _thread := TImageConvertor.Create(self.Handle);
+//        _thread_handle := _thread.Handle;
+    // TODO: start the file convert and copy
+
+//        for i := 0 to 99 do begin
+//            Application.ProcessMessages;
+//            progressConvertMove.Position := i;
+//            sleep(25);
+//            TaskBarNative.SetProgressValue(Handle, i, 100);
+//        end;
+//        progressConvertMove.Position := 100;
+//        Application.ProcessMessages;
+//        sleep(200);
+    finally
+        progressConvertMove.Visible := false;
+        Btn_Close.Enabled := true;
+        Btn_Close.SetFocus;
+    end;
+end;
+
+procedure TClueForm.changeStyleClick(Sender: TObject);
+begin
+    if styleChooser.ItemIndex >= 0 then begin
+        TStyleManager.TrySetStyle(styleChooser.Items[styleChooser.ItemIndex]);
+    end;
 end;
 
 procedure TClueForm.buttonPanelResize(Sender: TObject);
@@ -91,10 +126,33 @@ begin
     Btn_Update.Width := buttonPanel.Width div 2;
 end;
 
+procedure TClueForm.FormResize(Sender: TObject);
+begin
+    // prepare size of progressbar on top of move button
+    progressConvertMove.Left := Btn_Update.Left + 2;
+    progressConvertMove.Width := Btn_Update.Width - 4;
+    progressConvertMove.Top := Btn_Update.Top + 2;
+    progressConvertMove.Height := Btn_Update.Height - 4;
+end;
+
+
 procedure TClueForm.FormCreate(Sender: TObject);
 var
     configname : string;
+    styles : TArray<String>;
+    i : integer;
 begin
+    // theme related stuff
+    styles := TStylemanager.StyleNames;
+    for i := 0 to length(styles) - 1 do
+        styleChooser.AddItem(styles[i], nil);
+    styleChooser.ItemIndex := 2;    // 'Emerald Light Slate'
+
+    TStyleManager.TrySetStyle(styleChooser.Items[2]);
+    TaskBarNative := CreateComObject(CLSID_TaskbarList) as ITaskBarList3;
+    TaskBarNative.SetProgressState(Handle, ord(TTaskBarProgressState.Normal));
+
+    // Actual application stuff
     configname := extractFilePath(Application.ExeName) + 'clues.config';
     config := TCluesConfig.Create(configname);
 
@@ -210,6 +268,17 @@ begin
 
     diskitem := (Sender as TMenuItem).Caption;
     updateFolderEdit(georefBEdit, diskitem);
+end;
+
+procedure TClueForm.HandleThreadProgress(var Message: TUMWorkerProgress);
+begin
+    progressConvertMove.Position := Message.progress;
+end;
+
+procedure TClueForm.HandleThreadResult(var Message: TUMWorkerDone);
+begin
+    Btn_Update.Enabled := true;
+    progressConvertMove.Visible := false;
 end;
 
 procedure TClueForm.updateFolderEdit(edit : TObject; folder : string);

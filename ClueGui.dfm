@@ -175,7 +175,7 @@ object ClueForm: TClueForm
       TabOrder = 4
       TextHint = 'Select the root folder to store the processed scenarios'
     end
-    object domainBEdit: TButtonedEdit
+    object ilwisDomainBEdit: TButtonedEdit
       Left = 152
       Top = 132
       Width = 409
@@ -190,7 +190,7 @@ object ClueForm: TClueForm
       TabOrder = 5
       TextHint = 'Select an ILWIS value domain object'
     end
-    object georefBEdit: TButtonedEdit
+    object ilwisGeorefBEdit: TButtonedEdit
       Left = 152
       Top = 162
       Width = 409

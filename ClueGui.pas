@@ -30,10 +30,10 @@ type
     mainEvents: TApplicationEvents;
     processedFolderListMenu: TPopupMenu;
     basefolderEdit: TButtonedEdit;
-    domainBEdit: TButtonedEdit;
+    ilwisDomainBEdit: TButtonedEdit;
     domainsMenu: TPopupMenu;
     georefsMenu: TPopupMenu;
-    georefBEdit: TButtonedEdit;
+    ilwisGeorefBEdit: TButtonedEdit;
     progressConvertMove: TProgressBar;
     styleChooser: TComboBox;
     procedure Btn_CloseClick(Sender: TObject);
@@ -166,9 +166,21 @@ end;
 
 // repopulate the folder lists and the files lists to account for external changes
 procedure TClueForm.mainEventsActivate(Sender: TObject);
+
+    procedure addMenuItem(where : TPopupMenu; fname : string; eventHandler : TNotifyEvent);
+    var
+        item : TMenuItem;
+    begin
+        item := TMenuItem.Create(where);
+        item.Caption := extractFileName(fname);
+        item.OnClick := eventHandler;
+        item.SubMenuImages := arrowImages;
+        item.ImageIndex := 1;
+        where.Items.Add(item);
+    end;
 var
     i : integer;
-    item : TMenuItem;
+//    mitem : TMenuItem;
     path : string;
     folders : TStringDynArray;
     files : TStringDynArray;
@@ -177,55 +189,36 @@ begin
     clueFolderListMenu.Items.Clear;
     processedFolderListMenu.Items.Clear;
     for i := 0 to length(folders) - 1 do begin
-        item := TMenuItem.Create(cluefolderListMenu);
-        item.Caption := extractFileName(folders[i]);
-        item.OnClick := clueFolderMenuClick;
-        item.SubMenuImages := arrowImages;
-        item.ImageIndex := 1;
-        clueFolderListMenu.Items.Add(item);
-
-        item := TMenuItem.Create(processedFolderListMenu);
-        item.Caption := extractFileName(folders[i]);
-        item.OnClick := ProcessedFolderMenuClick;
-        item.SubMenuImages := arrowImages;
-        item.ImageIndex := 1;
-        processedFolderListMenu.items.Add(item);
+        addMenuItem(cluefolderListMenu, ExtractFileName(folders[i]), clueFolderMenuClick);
+        addMenuItem(processedFolderListMenu, ExtractFileName(folders[i]), ProcessedFolderMenuClick);
     end;
+    addMenuItem(cluefolderListMenu, '<new>', clueFolderMenuClick);
+    addMenuItem(processedFolderListMenu, '<new>', ProcessedFolderMenuClick);
 
     path := ExpandFileName(cluefolderEdit.Text);
     // get ilwis domain files
     domainsMenu.Items.Clear;
-    domainBEdit.Color := clWebAliceBlue;
+    ilwisDomainBEdit.Color := clWebAliceBlue;
     if DirectoryExists(path) then begin
         files := TDirectory.GetFiles(path, '*.dom');
-        for i := 0 to length(files) - 1 do begin
-            item := TMenuItem.Create(domainsMenu);
-            item.Caption := extractFileName(files[i]);
-            item.OnClick := domainsMenuClick;
-            item.SubMenuImages := arrowImages;
-            item.ImageIndex := 2;
-            domainsMenu.Items.Add(item);
-        end;
-        domainBEdit.Enabled := (length(files) > 0);
+        for i := 0 to length(files) - 1 do
+            addMenuItem(domainsMenu, extractFileName(files[i]), domainsMenuClick);
+
+        ilwisDomainBEdit.Enabled := (length(files) > 0);
         if length(files) > 0 then
-            domainBEdit.Color := clWindow;
+            ilwisDomainBEdit.Color := clWindow;
     end;
     // get ilwis georef files
     georefsMenu.Items.Clear;
-    georefBEdit.Color := clWebAliceBlue;
+    ilwisGeorefBEdit.Color := clWebAliceBlue;
     if DirectoryExists(path) then begin
         files := TDirectory.GetFiles(path, '*.grf');
-        for i := 0 to length(files) - 1 do begin
-            item := TMenuItem.Create(georefsMenu);
-            item.Caption := extractFileName(files[i]);
-            item.OnClick := georefsMenuClick;
-            item.SubMenuImages := arrowImages;
-            item.ImageIndex := 3;
-            georefsMenu.Items.Add(item);
-        end;
-        georefBEdit.Enabled := (length(files) > 0);
+        for i := 0 to length(files) - 1 do
+            addMenuItem(georefsMenu, extractFileName(files[i]), georefsMenuClick);
+
+        ilwisGeorefBEdit.Enabled := (length(files) > 0);
         if length(files) > 0 then
-            georefBEdit.Color := clWindow;
+            ilwisGeorefBEdit.Color := clWindow;
     end;
 end;
 
@@ -237,6 +230,7 @@ begin
         exit;
 
     folder := (Sender as TMenuItem).Caption;
+
     updateFolderEdit(clueFolderEdit, folder);
     mainEventsActivate(cluefolderEdit);
 end;
@@ -260,7 +254,7 @@ begin
         exit;
 
     diskitem := (Sender as TMenuItem).Caption;
-    updateFolderEdit(domainBEdit, diskitem);
+    updateFolderEdit(ilwisDomainBEdit, diskitem);
 end;
 
 procedure TClueForm.georefsMenuClick(Sender: TObject);
@@ -271,7 +265,7 @@ begin
         exit;
 
     diskitem := (Sender as TMenuItem).Caption;
-    updateFolderEdit(georefBEdit, diskitem);
+    updateFolderEdit(ilwisGeorefBEdit, diskitem);
 end;
 
 procedure TClueForm.HandleThreadProgress(var Message: TUMWorkerProgress);
@@ -288,17 +282,38 @@ end;
 procedure TClueForm.updateFolderEdit(edit : TObject; folder : string);
 var
     item : TButtonedEdit;
+    newfolder : string;
 begin
     if not (edit is TButtonedEdit) then
         exit;
 
     item := edit as TButtonedEdit;
+
+    if folder = '<new>' then begin
+        if Length(item.Text) > 0 then
+            newfolder := ExpandFileName(item.Text);
+            if not DirectoryExists(newfolder) then begin
+                if CreateDir(newfolder) then begin
+                    folder := ExtractFileName(newfolder);
+                    mainEventsActivate(self);   // add the new folder to the menus
+                end;
+            end;
+    end;
+
     item.Text := folder;
 end;
 
 procedure TClueForm.saveConfig;
 begin
+    // save conversion configuration
     saveSpecialTEdit(self);
+
+    // save gui stuff
+    if styleChooser.ItemIndex >= 0 then
+        config.item['Theme'] := styleChooser.Items[styleChooser.ItemIndex]
+    else
+        config.item['Theme'] := styleChooser.Items[2];
+
 end;
 
 procedure TClueForm.saveSpecialTEdit(parent : TWinControl);
@@ -322,8 +337,9 @@ end;
 
 procedure TClueForm.populateFromConfig(parent : TWinControl);
 var
-    i : integer;
+    i, index : integer;
     ctrl : TControl;
+    item : string;
 begin
     for i := 0 to parent.ControlCount - 1 do begin
         ctrl := parent.controls[i];
@@ -331,12 +347,24 @@ begin
             // hint is "misused" to hold name of configuration property in each edit
             // showhint must be turned off!
             if not ctrl.Hint.IsEmpty then begin
-                if not config.item[ctrl.Hint].isEmpty then
-                    (ctrl as TButtonedEdit).Text := config.item[ctrl.Hint];
+                if not config.item[ctrl.Hint].isEmpty then begin
+                    item := ExpandFileName(config.item[ctrl.Hint]);
+//                    if FileExists(item) or DirectoryExists(item) then
+                        (ctrl as TButtonedEdit).Text := config.item[ctrl.Hint];
+                end;
             end;
         end;
         if ctrl is Tpanel then
             populateFromConfig(ctrl as TPanel);
+        if ctrl is TComboBox then begin
+            index := styleChooser.Items.IndexOf(config.item['Theme']);
+            if index >= 0 then
+                styleChooser.ItemIndex := index
+            else
+                styleChooser.ItemIndex := 2;
+
+            changeStyleClick(self);
+        end;
 
     end;
 end;

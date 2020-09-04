@@ -5,7 +5,7 @@ interface
 uses System.Generics.Collections;
 
 type
-    TProperties = (CluesOutputFolder = 1, BaseDestinationFolder = 2, SubfolderPattern = 3, IlwisGeoref = 4, IlwisDomain = 5, Invalid = 99);
+    TProperties = (CluesOutputFolder = 1, BaseDestinationFolder = 2, SubfolderPattern = 3, IlwisGeoref = 4, IlwisDomain = 5, GuiTheme = 10, Invalid = 99);
 
     TCluesConfig = class
         _config : TDictionary<string, string>;
@@ -157,11 +157,16 @@ var
             SubfolderPattern        : _folderPattern := Value;
         end;
 
-        if _config.ContainsKey(key) then
+        if _config.ContainsKey(key) then begin
             if _config[key] <> value then begin
                 _config[key] := Value;
                 _changed := true;
             end;
+        end
+        else begin
+            _config.Add(key, Value);
+            _changed := true;
+        end;
     end;
 
     function TCluesConfig.getStartNum : string;
@@ -348,6 +353,7 @@ initialization
     lookup.Add('SubfolderPattern', SubfolderPattern);
     lookup.Add('IlwisGeoref', IlwisGeoref);
     lookup.Add('IlwisDomain', IlwisDomain);
+    lookup.Add('Theme', GuiTheme);
 
 finalization
     config.Free;

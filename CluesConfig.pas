@@ -2,7 +2,7 @@ unit CluesConfig;
 
 interface
 
-uses System.Generics.Collections;
+uses Classes, Generics.Collections;
 
 type
     TProperties = (CluesOutputFolder = 1, BaseDestinationFolder = 2, SubfolderPattern = 3, IlwisGeoref = 4, IlwisDomain = 5, GuiTheme = 10, Invalid = 99);
@@ -32,6 +32,7 @@ type
         procedure setStartNum(startNum: string);
         function getProperty(key : string) : string;
         procedure setProperty(key: string; const Value: string);
+        function configKeys: TStrings;
 
     public
         constructor Create(configname : string);
@@ -46,6 +47,7 @@ type
         property startNum : string read getStartNum write setStartNum;
         property isValid : boolean read _valid;
         property item[key : string] : string read getProperty write setProperty;
+        property keys : TStrings read configKeys;
     end;
 
     var
@@ -54,7 +56,7 @@ type
 implementation
 
 uses
-    typinfo, classes, sysutils, ioutils, system.types, json.types, json.readers, json.writers, regularexpressions, math;
+    typinfo, sysutils, ioutils, system.types, json.types, json.readers, json.writers, regularexpressions, math;
 
 type
     // scenario folders look like: <name-part>_<number-part>
@@ -102,7 +104,20 @@ var
     end;
 
     //--------------------- TCluesConfig --------------------
-	constructor TCluesConfig.Create(configname : string);
+
+function TCluesConfig.configKeys: TStrings;
+var
+    key : string;
+    ts : TStringList;
+begin
+    ts := TStringList.Create;
+    for key in _config.Keys do
+        ts.Add(key);
+
+    result := ts;
+end;
+
+constructor TCluesConfig.Create(configname : string);
     begin
         _config := TDictionary<string, string>.Create;
         _name := configname;
@@ -314,6 +329,7 @@ var
 
         stream := TFileStream.Create(_name, fmOpenWrite or fmCreate);
         writer := TJsonTextWriter.Create(stream);
+        writer.Formatting := TJsonFormatting.Indented;
         try
             writer.WriteStartObject;
             writer.WritePropertyName('Configuration');
@@ -330,13 +346,6 @@ var
             stream.Free;
         end;
 
-
-	 {	config.put("CluesOutputFolder", Filename.getRelative(sourcePath, curDir));
-		config.put("SubfolderPattern", folderPattern);
-		config.setDoPersist(true); // after a call to put the entire config is saved
-		config.put("BaseDestinationFolder", Filename.getRelative(basePath, curDir));
-		config.setDoPersist(false);
-	}
     end;
 
 	procedure TCluesConfig.nextFolder;

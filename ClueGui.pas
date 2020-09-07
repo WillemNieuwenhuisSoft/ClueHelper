@@ -53,7 +53,6 @@ type
     procedure HandleThreadProgress(var Message: TUMWorkerProgress); message UM_WORKERPROGRESS;
 
     procedure saveConfig;
-    procedure saveSpecialTEdit(parent: TWinControl);
     procedure populateFromConfig(parent : TWinControl);
 
     procedure clueFolderMenuClick(Sender: TObject);
@@ -306,7 +305,11 @@ end;
 procedure TClueForm.saveConfig;
 begin
     // save conversion configuration
-    saveSpecialTEdit(self);
+    config.item['CluesOutputFolder'] := cluefolderEdit.Text;
+    config.item['BaseDestinationFolder'] := basefolderEdit.Text;
+    config.item['SubfolderPattern'] := patternEdit.Text;
+    config.item['IlwisGeoref'] := ilwisGeorefBEdit.Text;
+    config.item['IlwisDomain'] := ilwisDomainBEdit.Text;
 
     // save gui stuff
     if styleChooser.ItemIndex >= 0 then
@@ -316,57 +319,36 @@ begin
 
 end;
 
-procedure TClueForm.saveSpecialTEdit(parent : TWinControl);
-var
-    i : integer;
-    ctrl : TControl;
-begin
-    for i := 0 to parent.ControlCount - 1 do begin
-        ctrl := parent.controls[i];
-        if ctrl is TButtonedEdit then begin
-            // hint is "misused" to hold name of configuration property in each edit
-            // showhint must be turned off!
-            if not ctrl.Hint.IsEmpty then
-                config.item[ctrl.Hint] := (ctrl as TButtonedEdit).Text;
-        end;
-        if ctrl is Tpanel then
-            saveSpecialTEdit(ctrl as TPanel);
-
-    end;
-end;
-
 procedure TClueForm.populateFromConfig(parent : TWinControl);
 var
     i, index : integer;
     ctrl : TControl;
     item : string;
 begin
-    for i := 0 to parent.ControlCount - 1 do begin
-        ctrl := parent.controls[i];
-        if ctrl is TButtonedEdit then begin
-            // hint is "misused" to hold name of configuration property in each edit
-            // showhint must be turned off!
-            if not ctrl.Hint.IsEmpty then begin
-                if not config.item[ctrl.Hint].isEmpty then begin
-                    item := ExpandFileName(config.item[ctrl.Hint]);
-//                    if FileExists(item) or DirectoryExists(item) then
-                        (ctrl as TButtonedEdit).Text := config.item[ctrl.Hint];
-                end;
-            end;
-        end;
-        if ctrl is Tpanel then
-            populateFromConfig(ctrl as TPanel);
-        if ctrl is TComboBox then begin
-            index := styleChooser.Items.IndexOf(config.item['Theme']);
-            if index >= 0 then
-                styleChooser.ItemIndex := index
-            else
-                styleChooser.ItemIndex := 2;
+    item := config.item['CluesOutputFolder'];
+    if (length(item) > 0) and DirectoryExists(item) then cluefolderEdit.Text := item;
+    item := config.item['BaseDestinationFolder'];
+    if (length(item) > 0) and DirectoryExists(item) then basefolderEdit.Text := item;
+    item := config.item['SubfolderPattern'];
+    if length(item) > 0 then patternEdit.Text := item;
 
-            changeStyleClick(self);
-        end;
+    item := config.item['IlwisGeoref'];
+    if (length(item) > 0) and (length(config.sourceFolder) > 0) then
+        if FileExists(ExpandFileName(config.sourceFolder + '\' + item)) then
+            ilwisGeorefBEdit.Text := item;
+    item := config.item['IlwisDomain'];
+    if (length(item) > 0) and (length(config.sourceFolder) > 0) then
+        if FileExists(ExpandFileName(config.sourceFolder + '\' + item)) then
+            ilwisDomainBEdit.Text := item;
 
-    end;
+    item := config.item['Theme'];
+    index := styleChooser.Items.IndexOf(item);
+    if index >= 0 then
+        styleChooser.ItemIndex := index
+    else
+        styleChooser.ItemIndex := 2;    // fallback
+
+    changeStyleClick(self);
 end;
 
 end.

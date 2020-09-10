@@ -53,7 +53,7 @@ type
     procedure HandleThreadProgress(var Message: TUMWorkerProgress); message UM_WORKERPROGRESS;
 
     procedure saveConfig;
-    procedure populateFromConfig(parent : TWinControl);
+    procedure populateFromConfig;
 
     procedure clueFolderMenuClick(Sender: TObject);
     procedure processedFolderMenuClick(Sender: TObject);
@@ -95,6 +95,9 @@ begin
     try
         progressConvertMove.Visible := true;
         ic.convertAll;
+
+        config.nextFolder;
+        populateFromConfig;
         // start thread
 //        _thread := TImageConvertor.Create(self.Handle);
 //        _thread_handle := _thread.Handle;
@@ -159,7 +162,7 @@ begin
     configname := extractFilePath(Application.ExeName) + 'clues.config';
     config := TCluesConfig.Create(configname);
 
-    populateFromConfig(self);
+    populateFromConfig;
 
 end;
 
@@ -319,7 +322,7 @@ begin
 
 end;
 
-procedure TClueForm.populateFromConfig(parent : TWinControl);
+procedure TClueForm.populateFromConfig;
 var
     i, index : integer;
     ctrl : TControl;
@@ -331,6 +334,8 @@ begin
     if (length(item) > 0) and DirectoryExists(item) then basefolderEdit.Text := item;
     item := config.item['SubfolderPattern'];
     if length(item) > 0 then patternEdit.Text := item;
+    if config.startNum > 0 then
+        startatEdit.Text := config.getStartNumAsString;
 
     item := config.item['IlwisGeoref'];
     if (length(item) > 0) and (length(config.sourceFolder) > 0) then

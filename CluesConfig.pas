@@ -21,11 +21,8 @@ type
 
     private
 
-        function getDestPath: string;
-        function getLastDir(path: string): integer;
+        function getLastDir: integer;
         function getPattern(pattern: string; start: integer): string;
-        function getStartNum: string;
-        procedure nextFolder;
         procedure save;
         procedure load;
         procedure setFolderPattern(folderPattern: string);
@@ -33,18 +30,21 @@ type
         function getProperty(key : string) : string;
         procedure setProperty(key: string; const Value: string);
         function configKeys: TStrings;
+        function getSourcePath: string;
 
     public
         constructor Create(configname : string);
         destructor Destroy; override;
 
         function getScenarioFolder : string;
+        function getStartNumAsString: string;
 
         property configname : string read _name write _name;
-        property sourceFolder : string read _sourcePath write _sourcePath;
+        property sourceFolder : string read getSourcePath;
 //        property basePath : string read _basePath write _basePath;
 //        property folderPattern : string read _folderPattern write _folderPattern;
-        property startNum : string read getStartNum write setStartNum;
+        property startNum : integer read _startNum;
+        procedure nextFolder;
         property isValid : boolean read _valid;
         property item[key : string] : string read getProperty write setProperty;
         property keys : TStrings read configKeys;
@@ -105,19 +105,19 @@ var
 
     //--------------------- TCluesConfig --------------------
 
-function TCluesConfig.configKeys: TStrings;
-var
-    key : string;
-    ts : TStringList;
-begin
-    ts := TStringList.Create;
-    for key in _config.Keys do
-        ts.Add(key);
+    function TCluesConfig.configKeys: TStrings;
+    var
+        key : string;
+        ts : TStringList;
+    begin
+        ts := TStringList.Create;
+        for key in _config.Keys do
+            ts.Add(key);
 
-    result := ts;
-end;
+        result := ts;
+    end;
 
-constructor TCluesConfig.Create(configname : string);
+    constructor TCluesConfig.Create(configname : string);
     begin
         _config := TDictionary<string, string>.Create;
         _name := configname;
@@ -133,20 +133,20 @@ constructor TCluesConfig.Create(configname : string);
 
 	function TCluesConfig.getScenarioFolder: string;
     begin
-        Result := ExpandFileName(getPattern(_folderPattern, _startNum));
+        Result := IncludeTrailingPathDelimiter(_basePath) + getPattern(_folderPattern, _startNum);
     end;
 
-	destructor TCluesConfig.Destroy;
+	function TCluesConfig.getSourcePath: string;
+    begin
+        result := ExpandFileName(_config.Items['CluesOutputFolder']);
+    end;
+
+    destructor TCluesConfig.Destroy;
     begin
         save;
         _config.Free;
 
         inherited;
-    end;
-
-    function TCluesConfig.getDestPath : string;
-    begin
-        getDestPath := ExpandFileName(getPattern(_folderPattern, _startNum));
     end;
 
     function TCluesConfig.getProperty(key : string) : string;
@@ -184,9 +184,9 @@ constructor TCluesConfig.Create(configname : string);
         end;
     end;
 
-    function TCluesConfig.getStartNum : string;
+    function TCluesConfig.getStartNumAsString : string;
     begin
-		getStartNum := intToStr(_startNum);
+		getStartNumAsString := intToStr(_startNum);
     end;
 
     procedure TCluesConfig.load;
@@ -234,7 +234,7 @@ constructor TCluesConfig.Create(configname : string);
             if _config.ContainsKey('BaseDestinationFolder') then begin
                 _basePath := ExpandFileName(_config.Items['BaseDestinationFolder']);
                 if DirectoryExists(_basePath) then
-                    _startNum := getLastDir(_basePath);
+                    _startNum := getLastDir + 1;
             end;
             if _config.ContainsKey('SubfolderPattern') then
                 _folderPattern := _config.items['SubfolderPattern'];
@@ -258,7 +258,7 @@ constructor TCluesConfig.Create(configname : string);
 	procedure TCluesConfig.setFolderPattern(folderPattern : string);
     begin
 		_folderPattern := folderPattern;
-		_startNum := getLastDir(_basePath) + 1;
+		_startNum := getLastDir + 1;
 
     end;
 
@@ -279,13 +279,11 @@ constructor TCluesConfig.Create(configname : string);
             namePattern := match.Groups.Item[1].Value;
             numPattern := match.Groups.Item[2].Value;
             if length(pattern) > 0 then
-                len := length(pattern);
+                len := length(numPattern);
         end;
 
-        if start > 0 then begin
-            fmtstr := '%0' + format('%d', [len]) + 'd';
-            namePattern := namePattern + Format(fmtstr, [start]);
-        end
+        if start > 0 then
+            namePattern := namePattern + Format('%.*d', [len, start])
         else
             namePattern := namePattern + '00123456789'.substring(0, len);
 
@@ -294,7 +292,7 @@ constructor TCluesConfig.Create(configname : string);
 
     // Get the highest scenarionumber from the folder names matching the folder pattern
     // The path should exist!
-	function TCluesConfig.getLastDir(path : string) : integer;
+	function TCluesConfig.getLastDir : integer;
     var
         filter : TScenarioFolderFilter;
         max, value : integer;

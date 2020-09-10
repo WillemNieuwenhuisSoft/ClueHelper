@@ -56,11 +56,16 @@ begin
     folder := config.getScenarioFolder;
     files := TDirectory.GetFiles(folder);
     for i := 0 to length(files) - 1 do begin
-//        PostMessage(_owner, UM_WORKERPROGRESS, self.Handle, i + 1);
-        a2i.ascName := files[i];
-        a2i.ilwisName := ChangeFileExt(files[i], '.mpr');
-        a2i.convert;
+        if ExtractFileExt(files[i]) = '.asc' then begin
+
+    //        PostMessage(_owner, UM_WORKERPROGRESS, self.Handle, i + 1);
+            a2i.ascName := files[i];
+            a2i.ilwisName := ChangeFileExt(files[i], '.mpr');
+            a2i.convert;
+        end;
     end;
+
+//    showMessage('converted: ' + FloatToStr(watch.ElapsedMilliseconds / 1000.0));
 
 //    PostMessage(_owner, UM_WORKERDONE, Self.Handle, 0);
 

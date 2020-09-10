@@ -53,7 +53,8 @@ type
 
 implementation
 
-uses typinfo, inifiles;
+uses
+    typinfo, inifiles;
 
 { TIlwisByteMap }
 
@@ -113,7 +114,7 @@ var
 begin
     datafile := ChangeFileExt(_name, '.mp#');
 
-    data := TFileStream.Create(datafile, fmOpenWrite or fmCreate);
+    data := TBufferedFileStream.Create(datafile, fmOpenWrite or fmCreate);
     writer := TBinaryWriter.Create(data);
     try
         for row := 0 to _rows - 1 do
@@ -126,7 +127,6 @@ begin
     end;
 
     storeMetadata;
-
 end;
 
 procedure TIlwisMap<T>.storeElem(value: T);

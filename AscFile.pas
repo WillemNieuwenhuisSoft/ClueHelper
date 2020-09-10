@@ -29,18 +29,18 @@ type
             _countMetaData : integer;
             _last : integer;
             _c_pos : integer;
-            _cache : TVector<integer>;
-            _stats : TStats;
-
-        function getStats: TStats;
+            _stats: TStats;
+            _parts: TStringList;
+            function getStats: TStats;
 
     protected
-        function nextMetaField(var ascfile : TextFile) : string;
-        procedure loadMetadata(var ascfile : TextFile);
-        function next(var ascfile : TextFile) : integer;
-
+        function ReadLine(var Stream: TBufferedFileStream; var line: string): boolean;
+        function nextMetaField(var ascfile : TBufferedFileStream) : string;
+        procedure loadMetadata(var ascfile : TBufferedFileStream);
+        function nextRow(var ascfile : TBufferedFileStream) : TVector<integer>;
     public
         constructor Create;
+        destructor Destroy; override;
         function isCorner : boolean;
         function line(row : integer) : TVector<integer>;
         function isNodata(row, col : integer) : boolean;
@@ -60,7 +60,8 @@ type
 
 implementation
 
-uses sysutils, vcl.dialogs, math;
+uses
+    sysutils, vcl.dialogs, math;
 
 constructor TAscFile.Create;
 begin
@@ -69,8 +70,17 @@ begin
     _c_pos := 0;
     _unknown  := -MaxInt;
     _stats := TStats.Create(false);
+    _parts := TStringList.Create;
 
 end;
+
+destructor TAscFile.Destroy;
+begin
+    _parts.Free;
+
+    inherited;
+end;
+
 
 function TAscFile.getStats: TStats;
 var
@@ -125,31 +135,53 @@ begin
     result := _buffer;
 end;
 
-function TAscFile.nextMetaField(var ascfile : TextFile) : string;
-var line : string;
-    parts : TStringList;
+function TAscFile.ReadLine(var Stream: TBufferedFileStream; var line: string): boolean;
+var
+    RawLine: UTF8String;
+    ch: AnsiChar;
 begin
-    line := '';
-    if not Eof(ascfile) then begin
-        Readln(ascfile, line);
+    result := false;
+    ch := #0;
+    while (Stream.Read(ch, 1) = 1) and (ch <> #13) do
+    begin
+        result := true;
+        RawLine := RawLine + ch;
     end;
-
-    parts := TStringList.Create;
-    parts.CommaText := line;
-    _isCorner := parts[0] = 'center';
-
-    result := '';
-    if parts.Count = 2 then
-        result := parts[1];
-
-    parts.Free;
-
+    line := RawLine;
+    if ch = #13 then
+    begin
+        result := true;
+        if (Stream.Read(ch, 1) = 1) and (ch <> #10) then
+            Stream.Seek(-1, soCurrent) // unread it if not LF character.
+    end
 end;
 
-procedure TAscFile.loadMetadata(var ascfile : TextFile);
+function TAscFile.nextMetaField(var ascfile : TBufferedFileStream) : string;
+var
+    line : string;
+    position : int64;
+    num : double;
+begin
+    position := ascfile.Position;
+
+    line := '';
+    ReadLine(ascfile, line);
+
+    _parts.CommaText := line;
+    _isCorner := _parts[0] = 'center';
+
+    result := '';
+    if _parts.Count = 2 then
+        result := _parts[1]
+    else begin
+        if TryStrToFloat(_parts[0], num) then
+            ascfile.Position := position;   // reset file pointer if not metadata field
+    end;
+end;
+
+procedure TAscFile.loadMetadata(var ascfile : TBufferedFileStream);
 var
     unk : string;
-    l : integer;
 begin
     _cols := StrToInt(nextMetaField(ascfile));
     _rows := StrToInt(nextMetaField(ascfile));
@@ -165,58 +197,69 @@ begin
         _unknown := StrToInt(unk);
     end;
 
-    reset(ascfile);
-    for l := 0 to _countMetaData - 1 do
-        readln(ascfile);
-	// now we are at the start of the data section
-
 end;
 
-function TAscFile.next(var ascfile : TextFile) : integer;
+function TAscFile.nextRow(var ascfile: TBufferedFileStream): TVector<integer>;
 var
-    parts : TStringList;
-    line : string;
-    v : integer;
+    RawLine: UTF8String;
+    ch: AnsiChar;
+    values : TVector<integer>;
+    strval : string;
+    col : integer;
+    eof : boolean;
 begin
-    if _c_pos >= _last then begin
-        readln(ascfile, line);
-        parts := TStringList.Create;
-        parts.CommaText := line;
-        if parts.Count > length(_cache) then
-            // assumption: only happens the first time as cache is still unallocated
-            // assumption 2: all lines contain the same number of values (except maybe the last)
-            SetLength(_cache, parts.Count);
-        _c_pos := 0;
-        _last := parts.Count;
-        for v := 0 to parts.Count - 1 do
-            _cache[v] := StrToInt(parts[v]);
+    setLength(values, _cols);
+    ch := #0;
+    col := 0;
+    eof := false;
+    while (not eof) and (col < _cols) do begin
+        eof := ascfile.Read(ch, 1) = 0;
+
+        // skip white space
+        while (not eof) and ( (ch = #13) or (ch = #10) or (ch = ' ') or (ch = #9)) do
+            eof := ascfile.Read(ch, 1) = 0;
+
+        // either EOF or ch is non-whitespace
+        while (not eof) and (ch <> #13) and (ch <> #10) and (ch <> ' ') and (ch <> #9) do
+        begin
+            RawLine := RawLine + ch;
+            eof := ascfile.Read(ch, 1) = 0;
+        end;
+
+        // either EOF of ch is whitespace
+        // convert found string to value
+        strval := RawLine;
+        RawLine := '';
+        values[col] := StrToIntDef(strval, _unknown);
+
+        inc(col);
+
     end;
 
-    result :=  _cache[_c_pos];
-    inc(_c_pos);
-
+    result := values;
 end;
 
+
 procedure TAscFile.load;
-var ascfile : TextFile;
-    row, col : integer;
+var
+    row : integer;
+    ascfile : TBufferedFileStream;
 begin
+    ascfile := TBufferedFileStream.Create(_name, fmOpenRead);
+
     try
-        Assign(ascfile, self._name);
-        Reset(ascfile);
         try
             loadMetadata(ascfile);
-            SetLength(_buffer, _rows, _cols);
+            SetLength(_buffer, _rows);
             for row := 0 to _rows - 1 do
-                for col := 0 to _cols - 1 do
-                    _buffer[row][col] := next(ascfile);
+                _buffer[row] := nextRow(ascfile);
 
         except
             on EConvertError do
               ShowMessage('Integer number expected: does the ASC file contain floats?');
         end;
     finally
-        Close(ascfile);
+        ascfile.Free;
     end;
 
 end;

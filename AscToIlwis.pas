@@ -46,8 +46,8 @@ uses
 		ilwis.rows := asc.rows;
         // Domain and GeoRef need to be supplied by user
         // This metadata cannot be determined from the AscFile
-		ilwis.georef := config.item['ilwisgeoref'];
-		ilwis.domain := config.item['ilwisdomain'];
+		ilwis.georef := config.item['IlwisGeoref'];
+		ilwis.domain := config.item['IlwisDomain'];
 
 		ilwis.store();
     end;

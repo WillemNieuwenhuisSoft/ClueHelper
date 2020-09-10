@@ -39,12 +39,12 @@ type
     var
         name_part : string;
     begin
-        _regex := TRegEx.Create('cov_all[.]\\d+|prob\\d+_.*[.]\\d+');
+        _regex := TRegEx.Create('cov_all[.]\d+|prob\d+_.*[.]\d+');
     end;
 
     function TScenarioFileFilter.accept(filename : string): boolean;
     begin
-        _match := _regex.Match(filename);
+        _match := _regex.Match(ExtractFileName(filename));
         accept := _match.Success;
     end;
 
@@ -84,7 +84,7 @@ var
     files : TStringDynArray;
 begin
     // retrieve the source and destination folders
-    sourceFolder := config.item['CluesOutputFolder'];
+    sourceFolder := config.sourceFolder;
     targetFolder := config.getScenarioFolder;
 
     // destination does not exist (at least should not; is checked at startup or change of destination root)
@@ -102,9 +102,9 @@ begin
     for i := 0 to length(files) - 1 do begin
         if filter.accept(files[i]) then begin
             // move the file
-            newfile := ChangeFilePath(ChangeFileExt(files[i], '.asc'), targetFolder);
+            newfile := ExpandFileName(ChangeFilePath(files[i] + '.asc', targetFolder));
             try
-                TDirectory.Move(files[i], newfile);
+                TFile.Move(files[i], newfile);
                 inc(done);
             except
 //					logger.warning(file + " NOT moved to " + newFile);
@@ -154,10 +154,11 @@ begin
     filesToCopy.Add(grf);
 
     grfIni := TIniFile.Create(grf);
-    entry := grfIni.ReadString('TableStore', 'Data', '');       // cannot be empty
-    filesToCopy.Add(ChangeFilePath(entry, config.sourceFolder));
-    entry := grfIni.ReadString('GeoRef', 'CoordSystem', '');    // maybe empty
+    entry := grfIni.ReadString('TableStore', 'Data', '');       // maybe be empty
     if length(entry) > 0  then
+        filesToCopy.Add(ChangeFilePath(entry, config.sourceFolder));
+    entry := grfIni.ReadString('GeoRef', 'CoordSystem', '');    // maybe empty; in case of unknown.csy do not copy
+    if (length(entry) > 0) and (entry <> 'unknown.csy')  then
         filesToCopy.Add(ChangeFilePath(entry, config.sourceFolder));
     entry := grfIni.ReadString('GeoRefCTP', 'Reference Map', ''); // maybe empty
     if length(entry) > 0  then

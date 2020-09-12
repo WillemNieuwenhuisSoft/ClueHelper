@@ -34,8 +34,9 @@ type
     domainsMenu: TPopupMenu;
     georefsMenu: TPopupMenu;
     ilwisGeorefBEdit: TButtonedEdit;
-    progressConvertMove: TProgressBar;
     styleChooser: TComboBox;
+    progressConvertMove: TProgressBar;
+    progressLabel: TLabel;
     procedure Btn_CloseClick(Sender: TObject);
     procedure Btn_UpdateClick(Sender: TObject);
     procedure buttonPanelResize(Sender: TObject);
@@ -44,10 +45,9 @@ type
     procedure changeStyleClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
   private
-    { Private declarations }
     TaskBarNative: ITaskBarList3;
-    _thread : TImageConvertor;
-    _thread_handle : THandle;
+    progressConvertMovebackup : TProgressBar;
+    _ic : TImageConvertor;
 
     procedure HandleThreadResult(var Message: TUMWorkerDone); message UM_WORKERDONE;
     procedure HandleThreadProgress(var Message: TUMWorkerProgress); message UM_WORKERPROGRESS;
@@ -84,38 +84,17 @@ begin
 end;
 
 procedure TClueForm.Btn_UpdateClick(Sender: TObject);
-var
-    ic : TImageConvertor;
 begin
     saveConfig;
 
     Btn_Close.Enabled := false;
-
-    ic := TImageConvertor.Create(self.Handle);
+    progressConvertMove.Visible := true;
     try
-        progressConvertMove.Visible := true;
-        ic.convertAll;
-
-        config.nextFolder;
-        populateFromConfig;
         // start thread
-//        _thread := TImageConvertor.Create(self.Handle);
-//        _thread_handle := _thread.Handle;
-    // TODO: start the file convert and copy
+        _ic := TImageConvertor.Create(self.Handle);
 
-//        for i := 0 to 99 do begin
-//            Application.ProcessMessages;
-//            progressConvertMove.Position := i;
-//            sleep(25);
-//            TaskBarNative.SetProgressValue(Handle, i, 100);
-//        end;
-//        progressConvertMove.Position := 100;
-//        Application.ProcessMessages;
-//        sleep(200);
     finally
-        progressConvertMove.Visible := false;
-        Btn_Close.Enabled := true;
-        Btn_Close.SetFocus;
+        // nothing to do, should be handled in HandleThreadResult
     end;
 end;
 
@@ -139,6 +118,13 @@ begin
     progressConvertMove.Width := Btn_Update.Width - 4;
     progressConvertMove.Top := Btn_Update.Top + 2;
     progressConvertMove.Height := Btn_Update.Height - 4;
+
+    // Now adjust the progress label
+    progressLabel.Top := 0;
+    progressLabel.Left := 0;
+    progressLabel.Width := progressConvertMove.ClientWidth;
+    progressLabel.Height := progressConvertMove.ClientHeight;
+
 end;
 
 
@@ -157,6 +143,16 @@ begin
     TStyleManager.TrySetStyle(styleChooser.Items[2]);
     TaskBarNative := CreateComObject(CLSID_TaskbarList) as ITaskBarList3;
     TaskBarNative.SetProgressState(Handle, ord(TTaskBarProgressState.Normal));
+
+    progressLabel.Parent := progressConvertMove;
+    progressLabel.AutoSize := false;
+    progressLabel.Transparent := true;
+    progressLabel.Top := 0;
+    progressLabel.Left := 0;
+    progressLabel.Width := progressConvertMove.ClientWidth;
+    progressLabel.Height := progressConvertMove.ClientHeight;
+    progressLabel.Alignment := taCenter;
+    progressLabel.Layout := tlCenter;
 
     // Actual application stuff
     configname := extractFilePath(Application.ExeName) + 'clues.config';
@@ -182,7 +178,6 @@ procedure TClueForm.mainEventsActivate(Sender: TObject);
     end;
 var
     i : integer;
-//    mitem : TMenuItem;
     path : string;
     folders : TStringDynArray;
     files : TStringDynArray;
@@ -272,13 +267,23 @@ end;
 
 procedure TClueForm.HandleThreadProgress(var Message: TUMWorkerProgress);
 begin
+    progressConvertMove.Max := Message.total;
     progressConvertMove.Position := Message.progress;
+    progressLabel.Caption := Format('%d %%', [Message.progress]);
+    TaskBarNative.SetProgressValue(Handle, Message.progress, Message.total);
 end;
 
 procedure TClueForm.HandleThreadResult(var Message: TUMWorkerDone);
 begin
-    Btn_Update.Enabled := true;
     progressConvertMove.Visible := false;
+    Btn_Close.Enabled := true;
+    Btn_Close.SetFocus;
+    TaskBarNative.SetProgressValue(Handle, 0, 100);
+
+    // update config
+    config.nextFolder;
+    populateFromConfig;
+
 end;
 
 procedure TClueForm.updateFolderEdit(edit : TObject; folder : string);
@@ -324,8 +329,7 @@ end;
 
 procedure TClueForm.populateFromConfig;
 var
-    i, index : integer;
-    ctrl : TControl;
+    index : integer;
     item : string;
 begin
     item := config.item['CluesOutputFolder'];

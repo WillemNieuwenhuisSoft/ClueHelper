@@ -23,6 +23,13 @@ object ClueForm: TClueForm
     Align = alBottom
     TabOrder = 0
     OnResize = buttonPanelResize
+    object progressLabel: TLabel
+      Left = 120
+      Top = 8
+      Width = 80
+      Height = 16
+      Caption = 'progressLabel'
+    end
     object Btn_Close: TButton
       Left = 280
       Top = 1
@@ -45,13 +52,9 @@ object ClueForm: TClueForm
     end
     object progressConvertMove: TProgressBar
       Left = 24
-      Top = 6
-      Width = 100
-      Height = 19
-      Smooth = True
-      MarqueeInterval = 2
-      BarColor = clRed
-      Step = 1
+      Top = 8
+      Width = 150
+      Height = 17
       TabOrder = 2
       Visible = False
     end

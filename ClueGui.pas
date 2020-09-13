@@ -21,7 +21,6 @@ type
     patternEdit: TEdit;
     startatlabel: TLabel;
     startatEdit: TEdit;
-    exampleEdit: TEdit;
     domainLabel: TLabel;
     georefLabel: TLabel;
     cluefolderEdit: TButtonedEdit;
@@ -37,6 +36,9 @@ type
     styleChooser: TComboBox;
     progressConvertMove: TProgressBar;
     progressLabel: TLabel;
+    exploreButton: TButton;
+    historyCombobox: TComboBox;
+    recentLabel: TLabel;
     procedure Btn_CloseClick(Sender: TObject);
     procedure Btn_UpdateClick(Sender: TObject);
     procedure buttonPanelResize(Sender: TObject);
@@ -44,6 +46,7 @@ type
     procedure mainEventsActivate(Sender: TObject);
     procedure changeStyleClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
+    procedure exploreButtonClick(Sender: TObject);
   private
     TaskBarNative: ITaskBarList3;
     progressConvertMovebackup : TProgressBar;
@@ -89,13 +92,10 @@ begin
 
     Btn_Close.Enabled := false;
     progressConvertMove.Visible := true;
-    try
-        // start thread
-        _ic := TImageConvertor.Create(self.Handle);
 
-    finally
-        // nothing to do, should be handled in HandleThreadResult
-    end;
+    // start thread
+    _ic := TImageConvertor.Create(self.Handle);
+
 end;
 
 procedure TClueForm.changeStyleClick(Sender: TObject);
@@ -217,6 +217,7 @@ begin
         if length(files) > 0 then
             ilwisGeorefBEdit.Color := clWindow;
     end;
+
 end;
 
 procedure TClueForm.clueFolderMenuClick(Sender: TObject);
@@ -254,6 +255,12 @@ begin
     updateFolderEdit(ilwisDomainBEdit, diskitem);
 end;
 
+procedure TClueForm.exploreButtonClick(Sender: TObject);
+begin
+    if historyCombobox.ItemIndex >= 0 then
+        ShellExecute(Handle, 'open', PChar(historyCombobox.Items[historyCombobox.ItemIndex]), nil, nil, SW_SHOWNORMAL);
+end;
+
 procedure TClueForm.georefsMenuClick(Sender: TObject);
 var
     diskitem : string;
@@ -266,19 +273,24 @@ begin
 end;
 
 procedure TClueForm.HandleThreadProgress(var Message: TUMWorkerProgress);
+var
+    progress : integer;
 begin
     progressConvertMove.Max := Message.total;
     progressConvertMove.Position := Message.progress;
-    progressLabel.Caption := Format('%d %%', [Message.progress]);
+    progress := Message.progress * 100 div Message.total;
+    progressLabel.Caption := Format('%d %%', [progress]);
     TaskBarNative.SetProgressValue(Handle, Message.progress, Message.total);
 end;
 
 procedure TClueForm.HandleThreadResult(var Message: TUMWorkerDone);
 begin
     progressConvertMove.Visible := false;
+    TaskBarNative.SetProgressValue(Handle, 0, 100);
+    historyCombobox.Items.Insert(0, ExpandFileName(config.getScenarioFolder));
+    exploreButton.Enabled := historyCombobox.Items.Count > 0;
     Btn_Close.Enabled := true;
     Btn_Close.SetFocus;
-    TaskBarNative.SetProgressValue(Handle, 0, 100);
 
     // update config
     config.nextFolder;

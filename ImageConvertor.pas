@@ -44,32 +44,40 @@ var
     i : integer;
     folder : string;
     files : TStringDynArray;
+    status : integer;
 begin
     inherited;
 
-    // move generated files
-    mv := TMoveScenarioFiles.Create;
-    mv.moveScenarioFiles;
-    // copy ilwis service files
-    mv.copyServiceObjects;
+    try
+        status := 1 ; // not moved and not converted
+        // move generated files
+        mv := TMoveScenarioFiles.Create;
+        if not mv.moveScenarioFiles then
+            exit;
 
-    // convert the move generated files
-    a2i := TAscToIlwis.Create;
-    folder := config.getScenarioFolder;
-    files := TDirectory.GetFiles(folder);
-    for i := 0 to length(files) - 1 do begin
-        if ExtractFileExt(files[i]) = '.asc' then begin
+        // copy ilwis service files
+        mv.copyServiceObjects;
 
-            PostMessage(_owner, UM_WORKERPROGRESS, length(files), i + 1);
-            a2i.ascName := files[i];
-            a2i.ilwisName := ChangeFileExt(files[i], '.mpr');
-            a2i.convert;
+        // convert the move generated files
+        a2i := TAscToIlwis.Create;
+        folder := config.getScenarioFolder;
+        files := TDirectory.GetFiles(folder);
+        for i := 0 to length(files) - 1 do begin
+            if ExtractFileExt(files[i]) = '.asc' then begin
+
+                PostMessage(_owner, UM_WORKERPROGRESS, length(files), i + 1);
+                a2i.ascName := files[i];
+                a2i.ilwisName := ChangeFileExt(files[i], '.mpr');
+                a2i.convert;
+            end;
         end;
+        status := 2; // files moved and converted.
+    finally
+        PostMessage(_owner, UM_WORKERDONE, 0, status);
+
+        mv.Free;
     end;
 
-    PostMessage(_owner, UM_WORKERDONE, 0, 0);
-
-    mv.Free;
 end;
 
 

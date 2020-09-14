@@ -145,9 +145,9 @@ begin
     while (Stream.Read(ch, 1) = 1) and (ch <> #13) do
     begin
         result := true;
-        RawLine := RawLine + ch;
+        RawLine := RawLine + UTF8String(ch);
     end;
-    line := RawLine;
+    line := string(RawLine);
     if ch = #13 then
     begin
         result := true;
@@ -222,13 +222,13 @@ begin
         // either EOF or ch is non-whitespace
         while (not eof) and (ch <> #13) and (ch <> #10) and (ch <> ' ') and (ch <> #9) do
         begin
-            RawLine := RawLine + ch;
+            RawLine := RawLine + UTF8String(ch);
             eof := ascfile.Read(ch, 1) = 0;
         end;
 
         // either EOF of ch is whitespace
         // convert found string to value
-        strval := RawLine;
+        strval := string(RawLine);
         RawLine := '';
         values[col] := StrToIntDef(strval, _unknown);
 

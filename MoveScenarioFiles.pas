@@ -13,7 +13,7 @@ type
 	public
         constructor Create;
 
-        procedure moveScenarioFiles;
+        function moveScenarioFiles : boolean;
         procedure copyServiceObjects;
 
     end;
@@ -36,8 +36,6 @@ type
     end;
 
     constructor TScenarioFileFilter.Create;
-    var
-        name_part : string;
     begin
         _regex := TRegEx.Create('cov_all[.]\d+|prob\d+_.*[.]\d+');
     end;
@@ -58,14 +56,21 @@ begin
 end;
 
 function TMoveScenarioFiles.createFolder(newFolder: string): boolean;
+var
+    fn : string;
 begin
-    if DirectoryExists(newFolder) then
-//			logger.info("Folder '" + newFolder + "' already exist, content (if any) will be replaced");
+    if DirectoryExists(newFolder) then begin
+        if config.item['OverwriteFolder'] = 'True' then begin
+            for fn in TDirectory.GetFiles(newFolder) do TFile.Delete(fn);
+            createFolder := true;
+        end
+        else
+            createFolder := false;
+    end
     else begin
         try
             TDirectory.CreateDirectory(newFolder);
         except
-//    		logger.severe("Unable to create base folder '" + newFolder + "', quitting program");
     		createFolder := false;
         end;
 		createFolder := true;
@@ -73,13 +78,12 @@ begin
     end;
 end;
 
-procedure TMoveScenarioFiles.moveScenarioFiles;
+function TMoveScenarioFiles.moveScenarioFiles : boolean;
 var
     sourceFolder : string;
     targetFolder : string;
     newfile : string;
     filter : TScenarioFileFilter;
-    done,
     i : integer;
     files : TStringDynArray;
 begin
@@ -90,29 +94,30 @@ begin
     // destination does not exist (at least should not; is checked at startup or change of destination root)
     // so create the new destination
     if not createFolder(targetFolder) then
+    begin
         // Unable to create destination folder; moving files NOT initiated
+        moveScenarioFiles := false;
         exit;
+    end;
 
     // get all the files from the source
     // and only move them if they are actual datafiles
     files := TDirectory.GetFiles(sourceFolder);
     filter := TScenarioFileFilter.Create;
-    done := 0;
-//		logger.info(source + " --> " + dest);
     for i := 0 to length(files) - 1 do begin
         if filter.accept(files[i]) then begin
             // move the file
             newfile := ExpandFileName(ChangeFilePath(files[i] + '.asc', targetFolder));
             try
                 TFile.Move(files[i], newfile);
-                inc(done);
             except
-//					logger.warning(file + " NOT moved to " + newFile);
+                // cannot move over existing file
+                // cannot not happen anyway
             end;
         end;
     end;
-//		logger.info("Moving files complete; " + Integer.toString(done) + " files moved");
 
+    moveScenarioFiles := true;
 
 end;
 
@@ -145,9 +150,9 @@ begin
         entry := rprIni.ReadString('TableStore', 'Data', '');   // maybe empty
         if length(entry) > 0  then
             filesToCopy.Add(ChangeFilePath(entry, config.sourceFolder));
+        rprIni.Free;
     end;
     domIni.Free;
-    rprIni.Free;
 
     // Georef and related
     grf := ChangeFilePath(config.item['IlwisGeoref'], config.sourceFolder);

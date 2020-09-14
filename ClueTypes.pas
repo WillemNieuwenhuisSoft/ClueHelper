@@ -16,7 +16,7 @@ type
 
 
 type
-    TUMWorkerDone = packed record
+    TUMWorkerDone = record
         Msg: Cardinal;
         ThreadHandle: Integer;
         unused: Integer;

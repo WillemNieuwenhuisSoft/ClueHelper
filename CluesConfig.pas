@@ -5,10 +5,9 @@ interface
 uses Classes, Generics.Collections;
 
 type
-    TProperties = (CluesOutputFolder = 1, BaseDestinationFolder = 2, SubfolderPattern = 3, IlwisGeoref = 4, IlwisDomain = 5, GuiTheme = 10, Invalid = 99);
-
     TCluesConfig = class
         _config : TDictionary<string, string>;
+        _history : TStringList;
 
         _name : string;         // filename of the config file
         _sourcePath : string;   // folder where clue stores the output (usually the folder where the exe can be found)
@@ -31,6 +30,7 @@ type
         procedure setProperty(key: string; const Value: string);
         function configKeys: TStrings;
         function getSourcePath: string;
+        function getPatternProp: string;
 
     public
         constructor Create(configname : string);
@@ -41,13 +41,13 @@ type
 
         property configname : string read _name write _name;
         property sourceFolder : string read getSourcePath;
-//        property basePath : string read _basePath write _basePath;
-//        property folderPattern : string read _folderPattern write _folderPattern;
-        property startNum : integer read _startNum;
+        property startNum : integer read _startNum write _startNum;
         procedure nextFolder;
         property isValid : boolean read _valid;
         property item[key : string] : string read getProperty write setProperty;
         property keys : TStrings read configKeys;
+        property history : TStringList read _history;
+        property pattern : string read getPatternProp write setFolderPattern;
     end;
 
     var
@@ -73,9 +73,6 @@ type
 
         property value : integer read _value;
     end;
-
-var
-    lookup : TDictionary<string, TProperties>;
 
     constructor TScenarioFolderFilter.Create(folderPattern : string);
     var
@@ -120,6 +117,7 @@ var
     constructor TCluesConfig.Create(configname : string);
     begin
         _config := TDictionary<string, string>.Create;
+        _history := TStringList.Create;
         _name := configname;
 
         // apply some defaults, possibly overruled by the load
@@ -158,19 +156,14 @@ var
     end;
 
     procedure TCluesConfig.setProperty(key: string; const Value: string);
-    var
-        k : TProperties;
     begin
         // don't allow setting of empty values
         if length(Value) = 0 then
             exit;
 
-        k := lookup[key];
-        case k of
-            CluesOutputFolder       : _sourcePath := Value;
-            BaseDestinationFolder   : _basePath := Value;
-            SubfolderPattern        : _folderPattern := Value;
-        end;
+        if key = 'CluesOutputFolder' then _sourcePath := Value;
+        if key = 'BaseDestinationFolder' then _basePath := Value;
+        if key = 'SubfolderPattern' then _folderPattern := Value;
 
         if _config.ContainsKey(key) then begin
             if _config[key] <> value then begin
@@ -255,11 +248,12 @@ var
 		_startNum := value;
      end;
 
-	procedure TCluesConfig.setFolderPattern(folderPattern : string);
+
+    procedure TCluesConfig.setFolderPattern(folderPattern : string);
     begin
 		_folderPattern := folderPattern;
-		_startNum := getLastDir + 1;
-
+        item['SubfolderPattern'] := _folderPattern;
+		_startNum := getLastDir + 1;            // recalc startnum, update folder list.
     end;
 
     function TCluesConfig.getPattern(pattern : string; start : integer) : string;
@@ -268,7 +262,6 @@ var
         match : TMatch;
         namePattern, numPattern : string;
         len : integer;
-        fmtstr : string;
     begin
         regex := TRegEx.Create('([a-zA-Z_]*)([0]{0,9})');
         match := regex.Match(pattern);
@@ -290,7 +283,12 @@ var
         getPattern := namePattern;
     end;
 
-    // Get the highest scenarionumber from the folder names matching the folder pattern
+    function TCluesConfig.getPatternProp: string;
+    begin
+        getPatternProp := _folderPattern;
+    end;
+
+// Get the highest scenarionumber from the folder names matching the folder pattern
     // The path should exist!
 	function TCluesConfig.getLastDir : integer;
     var
@@ -302,16 +300,20 @@ var
 		if length(_folderPattern) = 0 then
 			getLastDir := 1;
 
-        folders := TDirectory.getDirectories(_basePath); //, TSearchOption.soTopDirectoryOnly);
+        if _history.Count > 0 then _history.Clear;
+
+        folders := TDirectory.getDirectories(_basePath);
 		filter := TScenarioFolderFilter.Create(_folderPattern);
         max := 0;
         for i := 0 to length(folders) - 1 do begin
             if filter.accept(folders[i]) then begin
                 value := filter.value;
+                _history.Add(ExpandFileName(folders[i]));
                 if value > max then
                     max := value;
             end;
         end;
+        _history.Sort;     // A to Z
 
         getLastDir := max;
     end;
@@ -351,19 +353,9 @@ var
 		inc(_startNum);
     end;
 
-
 initialization
-    // allowed properties
-    lookup := TDictionary<string, TProperties>.Create;
-    lookup.Add('CluesOutputFolder', CluesOutputFolder);
-    lookup.Add('BaseDestinationFolder', BaseDestinationFolder);
-    lookup.Add('SubfolderPattern', SubfolderPattern);
-    lookup.Add('IlwisGeoref', IlwisGeoref);
-    lookup.Add('IlwisDomain', IlwisDomain);
-    lookup.Add('Theme', GuiTheme);
 
 finalization
     config.Free;
-    lookup.Free;
 
 end.

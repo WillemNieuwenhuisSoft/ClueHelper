@@ -39,6 +39,7 @@ type
     exploreButton: TButton;
     historyCombobox: TComboBox;
     recentLabel: TLabel;
+    overwriteCheckbox: TCheckBox;
     procedure Btn_CloseClick(Sender: TObject);
     procedure Btn_UpdateClick(Sender: TObject);
     procedure buttonPanelResize(Sender: TObject);
@@ -47,9 +48,10 @@ type
     procedure changeStyleClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure exploreButtonClick(Sender: TObject);
+    procedure startatEditExit(Sender: TObject);
+    procedure patternEditExit(Sender: TObject);
   private
     TaskBarNative: ITaskBarList3;
-    progressConvertMovebackup : TProgressBar;
     _ic : TImageConvertor;
 
     procedure HandleThreadResult(var Message: TUMWorkerDone); message UM_WORKERDONE;
@@ -288,6 +290,7 @@ begin
     progressConvertMove.Visible := false;
     TaskBarNative.SetProgressValue(Handle, 0, 100);
     historyCombobox.Items.Insert(0, ExpandFileName(config.getScenarioFolder));
+    historyCombobox.ItemIndex := 0;
     exploreButton.Enabled := historyCombobox.Items.Count > 0;
     Btn_Close.Enabled := true;
     Btn_Close.SetFocus;
@@ -295,6 +298,9 @@ begin
     // update config
     config.nextFolder;
     populateFromConfig;
+
+    if Message.Result = 1 then ShowMessage('Error moving and converting files');
+    if Message.Result = 2 then ShowMessage('Files successfully moved and converted');
 
 end;
 
@@ -330,6 +336,10 @@ begin
     config.item['SubfolderPattern'] := patternEdit.Text;
     config.item['IlwisGeoref'] := ilwisGeorefBEdit.Text;
     config.item['IlwisDomain'] := ilwisDomainBEdit.Text;
+    if overwriteCheckbox.Checked then
+        config.item['OverwriteFolder'] := 'True'
+    else
+        config.item['OverwriteFolder'] := 'False';
 
     // save gui stuff
     if styleChooser.ItemIndex >= 0 then
@@ -339,9 +349,40 @@ begin
 
 end;
 
+procedure TClueForm.startatEditExit(Sender: TObject);
+var
+    num :integer;
+begin
+    if length(startatEdit.Text) > 0 then begin
+        num := StrToIntDef(startatEdit.Text, -1);
+        if num > 0 then
+            config.startNum := num
+        else
+            ShowMessage('Please enter a valid number');
+    end;
+end;
+
+procedure TClueForm.patternEditExit(Sender: TObject);
+var
+    i : integer;
+begin
+    if length(basefolderEdit.Text) > 0 then
+        config.item['BaseDestinationFolder'] := basefolderEdit.Text;
+    if length(patternEdit.Text) > 0 then
+    begin
+        config.pattern := patternEdit.Text;
+        historyCombobox.Items.Clear;
+        for i := config.history.Count - 1 downto 0 do
+            historyCombobox.Items.Add(config.history[i]);   // add in reverse order
+        historyCombobox.ItemIndex := 0;
+        startatEdit.Text := config.getStartNumAsString;
+    end;
+
+end;
+
 procedure TClueForm.populateFromConfig;
 var
-    index : integer;
+    i, index : integer;
     item : string;
 begin
     item := config.item['CluesOutputFolder'];
@@ -351,7 +392,13 @@ begin
     item := config.item['SubfolderPattern'];
     if length(item) > 0 then patternEdit.Text := item;
     if config.startNum > 0 then
+    begin
         startatEdit.Text := config.getStartNumAsString;
+        historyCombobox.Items.Clear;
+        for i := config.history.Count - 1 downto 0 do
+            historyCombobox.Items.Add(config.history[i]);   // add in reverse order
+        historyCombobox.ItemIndex := 0;
+    end;
 
     item := config.item['IlwisGeoref'];
     if (length(item) > 0) and (length(config.sourceFolder) > 0) then
@@ -361,6 +408,9 @@ begin
     if (length(item) > 0) and (length(config.sourceFolder) > 0) then
         if FileExists(ExpandFileName(config.sourceFolder + '\' + item)) then
             ilwisDomainBEdit.Text := item;
+
+    item := config.item['OverwriteFolder'];
+    if length(item) > 0 then overwriteCheckbox.Checked := item = 'True';
 
     item := config.item['Theme'];
     index := styleChooser.Items.IndexOf(item);

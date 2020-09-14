@@ -133,6 +133,7 @@ object ClueForm: TClueForm
       BorderStyle = bsNone
       TabOrder = 0
       Text = 'scen_00000'
+      OnExit = patternEditExit
     end
     object startatEdit: TEdit
       Left = 152
@@ -143,6 +144,7 @@ object ClueForm: TClueForm
       BorderStyle = bsNone
       TabOrder = 1
       Text = '1'
+      OnExit = startatEditExit
     end
     object cluefolderEdit: TButtonedEdit
       Left = 152
@@ -177,6 +179,7 @@ object ClueForm: TClueForm
       RightButton.Visible = True
       TabOrder = 3
       TextHint = 'Select the root folder to store the processed scenarios'
+      OnExit = patternEditExit
     end
     object ilwisDomainBEdit: TButtonedEdit
       Left = 152
@@ -238,6 +241,14 @@ object ClueForm: TClueForm
       Height = 24
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 8
+    end
+    object overwriteCheckbox: TCheckBox
+      Left = 24
+      Top = 196
+      Width = 176
+      Height = 17
+      Caption = 'Overwrite existing folder'
+      TabOrder = 9
     end
   end
   object arrowImages: TImageList
@@ -518,30 +529,30 @@ object ClueForm: TClueForm
   object cluefolderListMenu: TPopupMenu
     AutoHotkeys = maManual
     Images = arrowImages
-    Left = 72
-    Top = 184
+    Left = 344
+    Top = 8
   end
   object mainEvents: TApplicationEvents
     OnActivate = mainEventsActivate
-    Left = 16
+    Left = 384
     Top = 184
   end
   object processedFolderListMenu: TPopupMenu
     AutoHotkeys = maManual
     Images = arrowImages
-    Left = 120
-    Top = 184
+    Left = 448
+    Top = 40
   end
   object domainsMenu: TPopupMenu
     AutoHotkeys = maManual
     Images = arrowImages
-    Left = 160
-    Top = 184
+    Left = 176
+    Top = 128
   end
   object georefsMenu: TPopupMenu
     AutoHotkeys = maManual
     Images = arrowImages
-    Left = 208
-    Top = 184
+    Left = 240
+    Top = 160
   end
 end

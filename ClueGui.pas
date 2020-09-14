@@ -162,6 +162,11 @@ begin
 
     populateFromConfig;
 
+    historyCombobox.Items.Clear;
+    for i := config.history.Count - 1 downto 0 do
+        historyCombobox.Items.Add(config.history[i]); // add in reverse order
+    historyCombobox.ItemIndex := 0;
+
 end;
 
 // repopulate the folder lists and the files lists to account for external changes
@@ -392,13 +397,7 @@ begin
     item := config.item['SubfolderPattern'];
     if length(item) > 0 then patternEdit.Text := item;
     if config.startNum > 0 then
-    begin
         startatEdit.Text := config.getStartNumAsString;
-        historyCombobox.Items.Clear;
-        for i := config.history.Count - 1 downto 0 do
-            historyCombobox.Items.Add(config.history[i]);   // add in reverse order
-        historyCombobox.ItemIndex := 0;
-    end;
 
     item := config.item['IlwisGeoref'];
     if (length(item) > 0) and (length(config.sourceFolder) > 0) then

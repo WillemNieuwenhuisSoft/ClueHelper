@@ -96,7 +96,7 @@ object ClueForm: TClueForm
     end
     object startatlabel: TLabel
       Left = 24
-      Top = 133
+      Top = 161
       Width = 43
       Height = 16
       Caption = 'Start at'
@@ -104,7 +104,7 @@ object ClueForm: TClueForm
     object domainLabel: TLabel
       Tag = 5
       Left = 24
-      Top = 160
+      Top = 188
       Width = 72
       Height = 19
       Caption = 'Ilwis domain'
@@ -112,7 +112,7 @@ object ClueForm: TClueForm
     object georefLabel: TLabel
       Tag = 4
       Left = 24
-      Top = 190
+      Top = 218
       Width = 67
       Height = 16
       Anchors = [akLeft, akTop, akBottom]
@@ -139,7 +139,7 @@ object ClueForm: TClueForm
     end
     object startatEdit: TEdit
       Left = 152
-      Top = 133
+      Top = 161
       Width = 409
       Height = 21
       Anchors = [akLeft, akTop, akRight]
@@ -185,7 +185,7 @@ object ClueForm: TClueForm
     end
     object ilwisDomainBEdit: TButtonedEdit
       Left = 152
-      Top = 160
+      Top = 188
       Width = 409
       Height = 24
       Hint = 'IlwisDomain'
@@ -201,7 +201,7 @@ object ClueForm: TClueForm
     end
     object ilwisGeorefBEdit: TButtonedEdit
       Left = 152
-      Top = 190
+      Top = 218
       Width = 409
       Height = 24
       Hint = 'IlwisGeoref'
@@ -217,7 +217,7 @@ object ClueForm: TClueForm
     end
     object styleChooser: TComboBox
       Left = 416
-      Top = 220
+      Top = 126
       Width = 145
       Height = 24
       Anchors = [akTop, akRight]
@@ -227,7 +227,7 @@ object ClueForm: TClueForm
     end
     object exploreButton: TButton
       Left = 504
-      Top = 259
+      Top = 258
       Width = 57
       Height = 25
       Hint = 'Open an explorer window in the ILWIS output folder'
@@ -245,26 +245,35 @@ object ClueForm: TClueForm
       TabOrder = 8
     end
     object overwriteCheckbox: TCheckBox
-      Left = 24
-      Top = 224
-      Width = 176
+      Left = 33
+      Top = 126
+      Width = 208
       Height = 17
-      Caption = 'Overwrite existing folder'
+      Caption = 'Overwrite existing output folder'
       TabOrder = 9
     end
     object AutostartCheckbox: TCheckBox
       Left = 33
       Top = 39
-      Width = 97
+      Width = 141
       Height = 17
-      Caption = 'Start Clue-S'
+      Caption = 'Auto start Clue-S'
       Enabled = False
       TabOrder = 10
     end
+    object aboutButton: TButton
+      Left = 334
+      Top = 125
+      Width = 75
+      Height = 25
+      Caption = 'About'
+      TabOrder = 11
+      OnClick = aboutButtonClick
+    end
   end
   object arrowImages: TImageList
-    Left = 320
-    Top = 184
+    Left = 288
+    Top = 288
     Bitmap = {
       494C010104000800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
@@ -545,8 +554,8 @@ object ClueForm: TClueForm
   end
   object mainEvents: TApplicationEvents
     OnActivate = mainEventsActivate
-    Left = 384
-    Top = 184
+    Left = 336
+    Top = 288
   end
   object processedFolderListMenu: TPopupMenu
     AutoHotkeys = maManual
@@ -557,13 +566,13 @@ object ClueForm: TClueForm
   object domainsMenu: TPopupMenu
     AutoHotkeys = maManual
     Images = arrowImages
-    Left = 176
-    Top = 128
+    Left = 120
+    Top = 176
   end
   object georefsMenu: TPopupMenu
     AutoHotkeys = maManual
     Images = arrowImages
-    Left = 240
-    Top = 160
+    Left = 136
+    Top = 216
   end
 end

@@ -11,7 +11,8 @@ uses
   MoveScenarioFiles in 'MoveScenarioFiles.pas',
   ImageConvertor in 'ImageConvertor.pas',
   Vcl.Themes,
-  Vcl.Styles;
+  Vcl.Styles,
+  About in 'About.pas' {aboutForm};
 
 {$R *.res}
 
@@ -19,5 +20,6 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TClueForm, ClueForm);
+  Application.CreateForm(TaboutForm, aboutForm);
   Application.Run;
 end.

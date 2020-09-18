@@ -41,6 +41,7 @@ type
     recentLabel: TLabel;
     overwriteCheckbox: TCheckBox;
     AutostartCheckbox: TCheckBox;
+    aboutButton: TButton;
     procedure Btn_CloseClick(Sender: TObject);
     procedure Btn_UpdateClick(Sender: TObject);
     procedure buttonPanelResize(Sender: TObject);
@@ -51,6 +52,7 @@ type
     procedure exploreButtonClick(Sender: TObject);
     procedure startatEditExit(Sender: TObject);
     procedure patternEditExit(Sender: TObject);
+    procedure aboutButtonClick(Sender: TObject);
   private
     TaskBarNative: ITaskBarList3;
     _ic : TImageConvertor;
@@ -81,7 +83,15 @@ implementation
 uses
     Registry, ShellApi, ComObj,
     themes, styles, system.types, ioutils,
-    CluesConfig;
+    CluesConfig, about;
+
+procedure TClueForm.aboutButtonClick(Sender: TObject);
+var
+    about : TaboutForm;
+begin
+    about := TaboutForm.Create(self);
+    about.Show;
+end;
 
 procedure TClueForm.Btn_CloseClick(Sender: TObject);
 begin

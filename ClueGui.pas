@@ -40,6 +40,7 @@ type
     historyCombobox: TComboBox;
     recentLabel: TLabel;
     overwriteCheckbox: TCheckBox;
+    AutostartCheckbox: TCheckBox;
     procedure Btn_CloseClick(Sender: TObject);
     procedure Btn_UpdateClick(Sender: TObject);
     procedure buttonPanelResize(Sender: TObject);
@@ -146,6 +147,7 @@ begin
     TaskBarNative := CreateComObject(CLSID_TaskbarList) as ITaskBarList3;
     TaskBarNative.SetProgressState(Handle, ord(TTaskBarProgressState.Normal));
 
+    // setup of progress bar
     progressLabel.Parent := progressConvertMove;
     progressLabel.AutoSize := false;
     progressLabel.Transparent := true;
@@ -238,6 +240,9 @@ begin
 
     updateFolderEdit(clueFolderEdit, folder);
     mainEventsActivate(cluefolderEdit);
+
+    AutostartCheckbox.Enabled := FileExists(ExpandFileName(clueFolderEdit.Text) + '\clues.exe');
+
 end;
 
 procedure TClueForm.processedFolderMenuClick(Sender: TObject);
@@ -249,6 +254,7 @@ begin
 
     folder := (Sender as TMenuItem).Caption;
     updateFolderEdit(baseFolderEdit, folder);
+
 end;
 
 procedure TClueForm.domainsMenuClick(Sender: TObject);
@@ -391,7 +397,11 @@ var
     item : string;
 begin
     item := config.item['CluesOutputFolder'];
-    if (length(item) > 0) and DirectoryExists(item) then cluefolderEdit.Text := item;
+    if (length(item) > 0) and DirectoryExists(item) then
+    begin
+        cluefolderEdit.Text := item;
+        AutostartCheckbox.Enabled := FileExists(ExpandFileName(clueFolderEdit.Text) + '\clues.exe');
+    end;
     item := config.item['BaseDestinationFolder'];
     if (length(item) > 0) and DirectoryExists(item) then basefolderEdit.Text := item;
     item := config.item['SubfolderPattern'];

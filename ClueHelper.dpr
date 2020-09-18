@@ -1,4 +1,4 @@
-program ClueS;
+program ClueHelper;
 
 uses
   Vcl.Forms,

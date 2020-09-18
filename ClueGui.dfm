@@ -1,8 +1,8 @@
 object ClueForm: TClueForm
   Left = 0
   Top = 0
-  Caption = 'Clue helper'
-  ClientHeight = 336
+  Caption = 'Clue Helper'
+  ClientHeight = 364
   ClientWidth = 578
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,7 +17,7 @@ object ClueForm: TClueForm
   TextHeight = 16
   object buttonPanel: TPanel
     Left = 0
-    Top = 269
+    Top = 297
     Width = 578
     Height = 67
     Align = alBottom
@@ -63,20 +63,20 @@ object ClueForm: TClueForm
     Left = 0
     Top = 0
     Width = 578
-    Height = 269
+    Height = 297
     Align = alClient
     ParentShowHint = False
     ShowHint = False
     TabOrder = 1
-    ExplicitTop = 2
     DesignSize = (
       578
-      269)
+      297)
     object basefolderLabel: TLabel
       Left = 24
-      Top = 41
+      Top = 69
       Width = 93
       Height = 16
+      Anchors = [akLeft, akTop, akBottom]
       Caption = 'Base destination'
     end
     object cluefolderLabel: TLabel
@@ -88,14 +88,15 @@ object ClueForm: TClueForm
     end
     object patternLabel: TLabel
       Left = 24
-      Top = 70
+      Top = 98
       Width = 100
       Height = 16
+      Anchors = [akLeft, akTop, akBottom]
       Caption = 'Subfolder pattern'
     end
     object startatlabel: TLabel
       Left = 24
-      Top = 105
+      Top = 133
       Width = 43
       Height = 16
       Caption = 'Start at'
@@ -103,29 +104,30 @@ object ClueForm: TClueForm
     object domainLabel: TLabel
       Tag = 5
       Left = 24
-      Top = 132
+      Top = 160
       Width = 72
-      Height = 16
+      Height = 19
       Caption = 'Ilwis domain'
     end
     object georefLabel: TLabel
       Tag = 4
       Left = 24
-      Top = 162
+      Top = 190
       Width = 67
       Height = 16
+      Anchors = [akLeft, akTop, akBottom]
       Caption = 'Ilwis georef'
     end
     object recentLabel: TLabel
       Left = 24
-      Top = 234
+      Top = 259
       Width = 119
       Height = 16
       Caption = 'Previous conversions'
     end
     object patternEdit: TEdit
       Left = 152
-      Top = 70
+      Top = 98
       Width = 409
       Height = 21
       Hint = 'SubfolderPattern'
@@ -137,7 +139,7 @@ object ClueForm: TClueForm
     end
     object startatEdit: TEdit
       Left = 152
-      Top = 105
+      Top = 133
       Width = 409
       Height = 21
       Anchors = [akLeft, akTop, akRight]
@@ -165,7 +167,7 @@ object ClueForm: TClueForm
     end
     object basefolderEdit: TButtonedEdit
       Left = 152
-      Top = 41
+      Top = 69
       Width = 409
       Height = 24
       Hint = 'BaseDestinationFolder'
@@ -183,7 +185,7 @@ object ClueForm: TClueForm
     end
     object ilwisDomainBEdit: TButtonedEdit
       Left = 152
-      Top = 132
+      Top = 160
       Width = 409
       Height = 24
       Hint = 'IlwisDomain'
@@ -199,7 +201,7 @@ object ClueForm: TClueForm
     end
     object ilwisGeorefBEdit: TButtonedEdit
       Left = 152
-      Top = 162
+      Top = 190
       Width = 409
       Height = 24
       Hint = 'IlwisGeoref'
@@ -215,17 +217,17 @@ object ClueForm: TClueForm
     end
     object styleChooser: TComboBox
       Left = 416
-      Top = 192
+      Top = 220
       Width = 145
       Height = 24
-      Anchors = [akRight]
+      Anchors = [akTop, akRight]
       TabOrder = 6
       Text = 'styleChooser'
       OnChange = changeStyleClick
     end
     object exploreButton: TButton
       Left = 504
-      Top = 231
+      Top = 259
       Width = 57
       Height = 25
       Hint = 'Open an explorer window in the ILWIS output folder'
@@ -236,7 +238,7 @@ object ClueForm: TClueForm
     end
     object historyCombobox: TComboBox
       Left = 152
-      Top = 231
+      Top = 259
       Width = 346
       Height = 24
       Anchors = [akLeft, akTop, akRight]
@@ -244,11 +246,20 @@ object ClueForm: TClueForm
     end
     object overwriteCheckbox: TCheckBox
       Left = 24
-      Top = 196
+      Top = 224
       Width = 176
       Height = 17
       Caption = 'Overwrite existing folder'
       TabOrder = 9
+    end
+    object AutostartCheckbox: TCheckBox
+      Left = 33
+      Top = 39
+      Width = 97
+      Height = 17
+      Caption = 'Start Clue-S'
+      Enabled = False
+      TabOrder = 10
     end
   end
   object arrowImages: TImageList

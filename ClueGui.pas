@@ -169,6 +169,9 @@ begin
         historyCombobox.Items.Add(config.history[i]); // add in reverse order
     historyCombobox.ItemIndex := 0;
 
+    if AutostartCheckbox.Checked then
+        if FileExists(ExpandFileName(clueFolderEdit.Text) + '\clues.exe') then
+            ShellExecute(Handle, 'open', PChar(ExpandFileName(clueFolderEdit.Text) + '\clues.exe'), nil, nil, SW_SHOWNORMAL) ;
 end;
 
 // repopulate the folder lists and the files lists to account for external changes
@@ -351,6 +354,10 @@ begin
         config.item['OverwriteFolder'] := 'True'
     else
         config.item['OverwriteFolder'] := 'False';
+    if AutostartCheckbox.Checked then
+        config.item['AutostartClueS'] := 'True'
+    else
+        config.item['AutostartClueS'] := 'False';
 
     // save gui stuff
     if styleChooser.ItemIndex >= 0 then
@@ -420,6 +427,8 @@ begin
 
     item := config.item['OverwriteFolder'];
     if length(item) > 0 then overwriteCheckbox.Checked := item = 'True';
+    item := config.item['AutostartClueS'];
+    if length(item) > 0 then AutostartCheckbox.Checked := item = 'True';
 
     item := config.item['Theme'];
     index := styleChooser.Items.IndexOf(item);

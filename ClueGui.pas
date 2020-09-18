@@ -53,6 +53,7 @@ type
     procedure startatEditExit(Sender: TObject);
     procedure patternEditExit(Sender: TObject);
     procedure aboutButtonClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     TaskBarNative: ITaskBarList3;
     _ic : TImageConvertor;
@@ -93,9 +94,14 @@ begin
     about.Show;
 end;
 
-procedure TClueForm.Btn_CloseClick(Sender: TObject);
+procedure TClueForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
     saveConfig;
+end;
+
+
+procedure TClueForm.Btn_CloseClick(Sender: TObject);
+begin
     Close;
 end;
 
@@ -139,7 +145,6 @@ begin
     progressLabel.Height := progressConvertMove.ClientHeight;
 
 end;
-
 
 procedure TClueForm.FormCreate(Sender: TObject);
 var

@@ -11,6 +11,7 @@ object ClueForm: TClueForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
   OnCreate = FormCreate
   OnResize = FormResize
   PixelsPerInch = 96
@@ -37,7 +38,7 @@ object ClueForm: TClueForm
       Height = 65
       Align = alRight
       Caption = 'Close'
-      TabOrder = 0
+      TabOrder = 1
       OnClick = Btn_CloseClick
     end
     object Btn_Update: TButton
@@ -47,7 +48,7 @@ object ClueForm: TClueForm
       Height = 65
       Align = alLeft
       Caption = 'Convert && Move'
-      TabOrder = 1
+      TabOrder = 0
       OnClick = Btn_UpdateClick
     end
     object progressConvertMove: TProgressBar
@@ -106,7 +107,7 @@ object ClueForm: TClueForm
       Left = 24
       Top = 188
       Width = 72
-      Height = 19
+      Height = 16
       Caption = 'Ilwis domain'
     end
     object georefLabel: TLabel
@@ -133,7 +134,7 @@ object ClueForm: TClueForm
       Hint = 'SubfolderPattern'
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
-      TabOrder = 0
+      TabOrder = 3
       Text = 'scen_00000'
       OnExit = patternEditExit
     end
@@ -144,7 +145,7 @@ object ClueForm: TClueForm
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
-      TabOrder = 1
+      TabOrder = 5
       Text = '1'
       OnExit = startatEditExit
     end
@@ -162,7 +163,7 @@ object ClueForm: TClueForm
       RightButton.ImageIndex = 0
       RightButton.PressedImageIndex = 0
       RightButton.Visible = True
-      TabOrder = 2
+      TabOrder = 0
       TextHint = 'Select the folder where clues resides'
     end
     object basefolderEdit: TButtonedEdit
@@ -179,7 +180,7 @@ object ClueForm: TClueForm
       RightButton.ImageIndex = 0
       RightButton.PressedImageIndex = 0
       RightButton.Visible = True
-      TabOrder = 3
+      TabOrder = 2
       TextHint = 'Select the root folder to store the processed scenarios'
       OnExit = patternEditExit
     end
@@ -196,7 +197,7 @@ object ClueForm: TClueForm
       RightButton.DropDownMenu = domainsMenu
       RightButton.ImageIndex = 0
       RightButton.Visible = True
-      TabOrder = 4
+      TabOrder = 6
       TextHint = 'Select an ILWIS value domain object'
     end
     object ilwisGeorefBEdit: TButtonedEdit
@@ -212,16 +213,16 @@ object ClueForm: TClueForm
       RightButton.DropDownMenu = georefsMenu
       RightButton.ImageIndex = 0
       RightButton.Visible = True
-      TabOrder = 5
+      TabOrder = 7
       TextHint = 'Select an ILWIS georeference object'
     end
     object styleChooser: TComboBox
-      Left = 416
-      Top = 126
+      Left = 415
+      Top = 125
       Width = 145
       Height = 24
       Anchors = [akTop, akRight]
-      TabOrder = 6
+      TabOrder = 11
       Text = 'styleChooser'
       OnChange = changeStyleClick
     end
@@ -233,7 +234,7 @@ object ClueForm: TClueForm
       Hint = 'Open an explorer window in the ILWIS output folder'
       Anchors = [akTop, akRight]
       Caption = 'Open'
-      TabOrder = 7
+      TabOrder = 9
       OnClick = exploreButtonClick
     end
     object historyCombobox: TComboBox
@@ -250,7 +251,7 @@ object ClueForm: TClueForm
       Width = 208
       Height = 17
       Caption = 'Overwrite existing output folder'
-      TabOrder = 9
+      TabOrder = 4
     end
     object AutostartCheckbox: TCheckBox
       Left = 33
@@ -259,7 +260,7 @@ object ClueForm: TClueForm
       Height = 17
       Caption = 'Auto start Clue-S'
       Enabled = False
-      TabOrder = 10
+      TabOrder = 1
     end
     object aboutButton: TButton
       Left = 334
@@ -267,7 +268,7 @@ object ClueForm: TClueForm
       Width = 75
       Height = 25
       Caption = 'About'
-      TabOrder = 11
+      TabOrder = 10
       OnClick = aboutButtonClick
     end
   end

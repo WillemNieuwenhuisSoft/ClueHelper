@@ -2578,8 +2578,8 @@ object aboutForm: TaboutForm
     ExplicitHeight = 105
   end
   object aboutMemo: TMemo
-    Left = 227
-    Top = 223
+    Left = 226
+    Top = 222
     Width = 185
     Height = 89
     Alignment = taCenter

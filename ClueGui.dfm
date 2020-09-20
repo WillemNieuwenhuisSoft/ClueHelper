@@ -47,7 +47,7 @@ object ClueForm: TClueForm
       Width = 280
       Height = 65
       Align = alLeft
-      Caption = 'Convert && Move'
+      Caption = 'Move && Convert'
       TabOrder = 0
       OnClick = Btn_UpdateClick
     end
@@ -97,7 +97,7 @@ object ClueForm: TClueForm
     end
     object startatlabel: TLabel
       Left = 24
-      Top = 161
+      Top = 125
       Width = 43
       Height = 16
       Caption = 'Start at'
@@ -140,7 +140,7 @@ object ClueForm: TClueForm
     end
     object startatEdit: TEdit
       Left = 152
-      Top = 161
+      Top = 125
       Width = 409
       Height = 21
       Anchors = [akLeft, akTop, akRight]
@@ -218,7 +218,7 @@ object ClueForm: TClueForm
     end
     object styleChooser: TComboBox
       Left = 415
-      Top = 125
+      Top = 152
       Width = 145
       Height = 24
       Anchors = [akTop, akRight]
@@ -247,7 +247,7 @@ object ClueForm: TClueForm
     end
     object overwriteCheckbox: TCheckBox
       Left = 33
-      Top = 126
+      Top = 153
       Width = 208
       Height = 17
       Caption = 'Overwrite existing output folder'
@@ -264,9 +264,10 @@ object ClueForm: TClueForm
     end
     object aboutButton: TButton
       Left = 334
-      Top = 125
+      Top = 152
       Width = 75
       Height = 25
+      Anchors = [akTop, akRight]
       Caption = 'About'
       TabOrder = 10
       OnClick = aboutButtonClick

@@ -151,6 +151,8 @@ var
     configname : string;
     styles : TArray<String>;
     i : integer;
+    szpos : string;
+    parts : TStringList;
 begin
     // theme related stuff
     styles := TStylemanager.StyleNames;
@@ -176,6 +178,30 @@ begin
     // Actual application stuff
     configname := extractFilePath(Application.ExeName) + 'clues.config';
     config := TCluesConfig.Create(configname);
+
+    parts := TStringList.Create;
+    parts.Delimiter := ',';
+    szpos := config.item['WindowPosition'];
+    if Length(szpos) > 0 then
+    begin
+        parts.CommaText := szpos;
+        if parts.Count = 2 then begin
+            self.Top := StrToIntDef(parts[0], self.Top);
+            self.Left := StrToIntDef(parts[1], self.Left);
+        end;
+
+    end;
+    szpos := config.item['WindowSize'];
+    if Length(szpos) > 0 then
+    begin
+        parts.CommaText := szpos;
+        if parts.Count = 2 then begin
+            self.Width := StrToIntDef(parts[0], self.Width);
+            self.Height := StrToIntDef(parts[1], self.Height);
+        end;
+
+    end;
+    parts.Free;
 
     populateFromConfig;
 
@@ -216,7 +242,6 @@ begin
         addMenuItem(cluefolderListMenu, ExtractFileName(folders[i]), clueFolderMenuClick);
         addMenuItem(processedFolderListMenu, ExtractFileName(folders[i]), ProcessedFolderMenuClick);
     end;
-    addMenuItem(cluefolderListMenu, '<new>', clueFolderMenuClick);
     addMenuItem(processedFolderListMenu, '<new>', ProcessedFolderMenuClick);
 
     path := ExpandFileName(cluefolderEdit.Text);
@@ -375,6 +400,8 @@ begin
         config.item['AutostartClueS'] := 'False';
 
     // save gui stuff
+    config.item['WindowPosition'] := Format('%d,%d', [self.Top, self.Left]);
+    config.item['WindowSize'] := Format('%d,%d', [self.Width, self.Height]);
     if styleChooser.ItemIndex >= 0 then
         config.item['Theme'] := styleChooser.Items[styleChooser.ItemIndex]
     else

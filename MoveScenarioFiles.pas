@@ -37,7 +37,7 @@ type
 
     constructor TScenarioFileFilter.Create;
     begin
-        _regex := TRegEx.Create('cov_all[.]\d+|prob\d+_.*[.]\d+');
+        _regex := TRegEx.Create('cov_all[.]\d+$|prob\d+_.*[.]\d+');
     end;
 
     function TScenarioFileFilter.accept(filename : string): boolean;
@@ -116,6 +116,10 @@ begin
             end;
         end;
     end;
+
+    // restore original cov_all.0 file
+    TFile.Copy(ExpandFileName(ChangeFilePath('cov_all.0.Copy', sourceFolder)),
+               ExpandFileName(ChangeFilePath('cov_all.0', sourceFolder)));
 
     moveScenarioFiles := true;
 

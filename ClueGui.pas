@@ -212,7 +212,7 @@ begin
 
     if AutostartCheckbox.Checked then
         if FileExists(ExpandFileName(clueFolderEdit.Text) + '\clues.exe') then
-            ShellExecute(Handle, 'open', PChar(ExpandFileName(clueFolderEdit.Text) + '\clues.exe'), nil, nil, SW_SHOWNORMAL) ;
+            ShellExecute(Handle, 'open', PChar(ExpandFileName(clueFolderEdit.Text) + '\clues.exe'), nil, PChar(ExpandFileName(clueFolderEdit.Text)), SW_SHOWNORMAL) ;
 end;
 
 // repopulate the folder lists and the files lists to account for external changes

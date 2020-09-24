@@ -5,8 +5,6 @@ interface
 type
     TMoveScenarioFiles = class
 
-//	static Logger logger = Logger.getLogger(MoveScenarioFiles.class.getName());
-//	private CluesConfig config;
 	private
         function createFolder(newFolder : string) : boolean;
 
@@ -99,6 +97,17 @@ begin
         moveScenarioFiles := false;
         exit;
     end;
+
+    if not FileExists(ExpandFileName(ChangeFilePath('cov_all.0', sourceFolder))) then
+    begin
+        // Not all file are available, stop
+        moveScenarioFiles := false;
+        exit;
+    end;
+
+    // make backup of original cov_all.0 file
+    TFile.Copy(ExpandFileName(ChangeFilePath('cov_all.0', sourceFolder)),
+               ExpandFileName(ChangeFilePath('cov_all.0.Copy', sourceFolder)));
 
     // get all the files from the source
     // and only move them if they are actual datafiles

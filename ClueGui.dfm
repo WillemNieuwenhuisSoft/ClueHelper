@@ -2,7 +2,7 @@ object ClueForm: TClueForm
   Left = 0
   Top = 0
   Caption = 'Clue Helper'
-  ClientHeight = 364
+  ClientHeight = 350
   ClientWidth = 578
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,14 +16,218 @@ object ClueForm: TClueForm
   OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 16
+  object mainPanel: TPanel
+    Left = 0
+    Top = 0
+    Width = 578
+    Height = 283
+    Align = alClient
+    ParentShowHint = False
+    ShowHint = False
+    TabOrder = 1
+    ExplicitTop = 2
+    ExplicitHeight = 304
+    DesignSize = (
+      578
+      283)
+    object cluefolderLabel: TLabel
+      Left = 24
+      Top = 11
+      Width = 75
+      Height = 16
+      Caption = 'Clue-S folder'
+    end
+    object startatlabel: TLabel
+      Left = 24
+      Top = 97
+      Width = 43
+      Height = 16
+      Caption = 'Start at'
+    end
+    object recentLabel: TLabel
+      Left = 24
+      Top = 231
+      Width = 119
+      Height = 16
+      Caption = 'Previous conversions'
+    end
+    object domainLabel: TLabel
+      Tag = 5
+      Left = 24
+      Top = 160
+      Width = 72
+      Height = 16
+      Caption = 'Ilwis domain'
+    end
+    object georefLabel: TLabel
+      Tag = 4
+      Left = 24
+      Top = 190
+      Width = 67
+      Height = 16
+      Caption = 'Ilwis georef'
+    end
+    object patternLabel: TLabel
+      Left = 24
+      Top = 70
+      Width = 100
+      Height = 16
+      Caption = 'Subfolder pattern'
+    end
+    object basefolderLabel: TLabel
+      Left = 24
+      Top = 41
+      Width = 93
+      Height = 16
+      Caption = 'Base destination'
+    end
+    object patternEdit: TEdit
+      Left = 152
+      Top = 70
+      Width = 409
+      Height = 21
+      Hint = 'SubfolderPattern'
+      Anchors = [akLeft, akTop, akRight]
+      BorderStyle = bsNone
+      TabOrder = 2
+      Text = 'scen_00000'
+      OnExit = patternEditExit
+    end
+    object startatEdit: TEdit
+      Left = 152
+      Top = 97
+      Width = 409
+      Height = 21
+      Anchors = [akLeft, akTop, akRight]
+      BorderStyle = bsNone
+      TabOrder = 3
+      Text = '1'
+      OnExit = startatEditExit
+    end
+    object cluefolderEdit: TButtonedEdit
+      Left = 152
+      Top = 11
+      Width = 409
+      Height = 24
+      Hint = 'CluesOutputFolder'
+      Anchors = [akLeft, akTop, akRight]
+      BorderStyle = bsNone
+      Images = arrowImages
+      RightButton.DropDownMenu = cluefolderListMenu
+      RightButton.HotImageIndex = 0
+      RightButton.ImageIndex = 0
+      RightButton.PressedImageIndex = 0
+      RightButton.Visible = True
+      TabOrder = 0
+      TextHint = 'Select the folder where clues resides'
+    end
+    object basefolderEdit: TButtonedEdit
+      Left = 152
+      Top = 41
+      Width = 409
+      Height = 24
+      Hint = 'BaseDestinationFolder'
+      Anchors = [akLeft, akTop, akRight]
+      BorderStyle = bsNone
+      Images = arrowImages
+      RightButton.DropDownMenu = processedFolderListMenu
+      RightButton.HotImageIndex = 0
+      RightButton.ImageIndex = 0
+      RightButton.PressedImageIndex = 0
+      RightButton.Visible = True
+      TabOrder = 1
+      TextHint = 'Select the root folder to store the processed scenarios'
+      OnExit = patternEditExit
+    end
+    object ilwisDomainBEdit: TButtonedEdit
+      Left = 152
+      Top = 160
+      Width = 409
+      Height = 24
+      Hint = 'IlwisDomain'
+      Anchors = [akLeft, akTop, akRight]
+      BorderStyle = bsNone
+      Enabled = False
+      Images = arrowImages
+      RightButton.DropDownMenu = domainsMenu
+      RightButton.ImageIndex = 0
+      RightButton.Visible = True
+      TabOrder = 5
+      TextHint = 'Select an ILWIS value domain object'
+    end
+    object ilwisGeorefBEdit: TButtonedEdit
+      Left = 152
+      Top = 190
+      Width = 409
+      Height = 24
+      Hint = 'IlwisGeoref'
+      Anchors = [akLeft, akTop, akRight]
+      BorderStyle = bsNone
+      Enabled = False
+      Images = arrowImages
+      RightButton.DropDownMenu = georefsMenu
+      RightButton.ImageIndex = 0
+      RightButton.Visible = True
+      TabOrder = 6
+      TextHint = 'Select an ILWIS georeference object'
+    end
+    object styleChooser: TComboBox
+      Left = 415
+      Top = 124
+      Width = 145
+      Height = 24
+      Anchors = [akTop, akRight]
+      TabOrder = 10
+      Text = 'styleChooser'
+      OnChange = changeStyleClick
+    end
+    object exploreButton: TButton
+      Left = 504
+      Top = 230
+      Width = 57
+      Height = 25
+      Hint = 'Open an explorer window in the ILWIS output folder'
+      Anchors = [akTop, akRight]
+      Caption = 'Open'
+      TabOrder = 8
+      OnClick = exploreButtonClick
+    end
+    object historyCombobox: TComboBox
+      Left = 152
+      Top = 231
+      Width = 346
+      Height = 24
+      Anchors = [akLeft, akTop, akRight]
+      TabOrder = 7
+    end
+    object overwriteCheckbox: TCheckBox
+      Left = 33
+      Top = 125
+      Width = 208
+      Height = 17
+      Caption = 'Overwrite existing output folder'
+      TabOrder = 4
+    end
+    object aboutButton: TButton
+      Left = 334
+      Top = 124
+      Width = 75
+      Height = 25
+      Anchors = [akTop, akRight]
+      Caption = 'About'
+      TabOrder = 9
+      OnClick = aboutButtonClick
+    end
+  end
   object buttonPanel: TPanel
     Left = 0
-    Top = 297
+    Top = 283
     Width = 578
     Height = 67
     Align = alBottom
     TabOrder = 0
     OnResize = buttonPanelResize
+    ExplicitTop = 297
     object progressLabel: TLabel
       Left = 120
       Top = 8
@@ -58,219 +262,6 @@ object ClueForm: TClueForm
       Height = 17
       TabOrder = 2
       Visible = False
-    end
-  end
-  object mainPanel: TPanel
-    Left = 0
-    Top = 0
-    Width = 578
-    Height = 297
-    Align = alClient
-    ParentShowHint = False
-    ShowHint = False
-    TabOrder = 1
-    DesignSize = (
-      578
-      297)
-    object basefolderLabel: TLabel
-      Left = 24
-      Top = 69
-      Width = 93
-      Height = 16
-      Anchors = [akLeft, akTop, akBottom]
-      Caption = 'Base destination'
-    end
-    object cluefolderLabel: TLabel
-      Left = 24
-      Top = 11
-      Width = 75
-      Height = 16
-      Caption = 'Clue-S folder'
-    end
-    object patternLabel: TLabel
-      Left = 24
-      Top = 98
-      Width = 100
-      Height = 16
-      Anchors = [akLeft, akTop, akBottom]
-      Caption = 'Subfolder pattern'
-    end
-    object startatlabel: TLabel
-      Left = 24
-      Top = 125
-      Width = 43
-      Height = 16
-      Caption = 'Start at'
-    end
-    object domainLabel: TLabel
-      Tag = 5
-      Left = 24
-      Top = 188
-      Width = 72
-      Height = 16
-      Caption = 'Ilwis domain'
-    end
-    object georefLabel: TLabel
-      Tag = 4
-      Left = 24
-      Top = 218
-      Width = 67
-      Height = 16
-      Anchors = [akLeft, akTop, akBottom]
-      Caption = 'Ilwis georef'
-    end
-    object recentLabel: TLabel
-      Left = 24
-      Top = 259
-      Width = 119
-      Height = 16
-      Caption = 'Previous conversions'
-    end
-    object patternEdit: TEdit
-      Left = 152
-      Top = 98
-      Width = 409
-      Height = 21
-      Hint = 'SubfolderPattern'
-      Anchors = [akLeft, akTop, akRight]
-      BorderStyle = bsNone
-      TabOrder = 3
-      Text = 'scen_00000'
-      OnExit = patternEditExit
-    end
-    object startatEdit: TEdit
-      Left = 152
-      Top = 125
-      Width = 409
-      Height = 21
-      Anchors = [akLeft, akTop, akRight]
-      BorderStyle = bsNone
-      TabOrder = 5
-      Text = '1'
-      OnExit = startatEditExit
-    end
-    object cluefolderEdit: TButtonedEdit
-      Left = 152
-      Top = 11
-      Width = 409
-      Height = 24
-      Hint = 'CluesOutputFolder'
-      Anchors = [akLeft, akTop, akRight]
-      BorderStyle = bsNone
-      Images = arrowImages
-      RightButton.DropDownMenu = cluefolderListMenu
-      RightButton.HotImageIndex = 0
-      RightButton.ImageIndex = 0
-      RightButton.PressedImageIndex = 0
-      RightButton.Visible = True
-      TabOrder = 0
-      TextHint = 'Select the folder where clues resides'
-    end
-    object basefolderEdit: TButtonedEdit
-      Left = 152
-      Top = 69
-      Width = 409
-      Height = 24
-      Hint = 'BaseDestinationFolder'
-      Anchors = [akLeft, akTop, akRight]
-      BorderStyle = bsNone
-      Images = arrowImages
-      RightButton.DropDownMenu = processedFolderListMenu
-      RightButton.HotImageIndex = 0
-      RightButton.ImageIndex = 0
-      RightButton.PressedImageIndex = 0
-      RightButton.Visible = True
-      TabOrder = 2
-      TextHint = 'Select the root folder to store the processed scenarios'
-      OnExit = patternEditExit
-    end
-    object ilwisDomainBEdit: TButtonedEdit
-      Left = 152
-      Top = 188
-      Width = 409
-      Height = 24
-      Hint = 'IlwisDomain'
-      Anchors = [akLeft, akTop, akRight]
-      BorderStyle = bsNone
-      Enabled = False
-      Images = arrowImages
-      RightButton.DropDownMenu = domainsMenu
-      RightButton.ImageIndex = 0
-      RightButton.Visible = True
-      TabOrder = 6
-      TextHint = 'Select an ILWIS value domain object'
-    end
-    object ilwisGeorefBEdit: TButtonedEdit
-      Left = 152
-      Top = 218
-      Width = 409
-      Height = 24
-      Hint = 'IlwisGeoref'
-      Anchors = [akLeft, akTop, akRight]
-      BorderStyle = bsNone
-      Enabled = False
-      Images = arrowImages
-      RightButton.DropDownMenu = georefsMenu
-      RightButton.ImageIndex = 0
-      RightButton.Visible = True
-      TabOrder = 7
-      TextHint = 'Select an ILWIS georeference object'
-    end
-    object styleChooser: TComboBox
-      Left = 415
-      Top = 152
-      Width = 145
-      Height = 24
-      Anchors = [akTop, akRight]
-      TabOrder = 11
-      Text = 'styleChooser'
-      OnChange = changeStyleClick
-    end
-    object exploreButton: TButton
-      Left = 504
-      Top = 258
-      Width = 57
-      Height = 25
-      Hint = 'Open an explorer window in the ILWIS output folder'
-      Anchors = [akTop, akRight]
-      Caption = 'Open'
-      TabOrder = 9
-      OnClick = exploreButtonClick
-    end
-    object historyCombobox: TComboBox
-      Left = 152
-      Top = 259
-      Width = 346
-      Height = 24
-      Anchors = [akLeft, akTop, akRight]
-      TabOrder = 8
-    end
-    object overwriteCheckbox: TCheckBox
-      Left = 33
-      Top = 153
-      Width = 208
-      Height = 17
-      Caption = 'Overwrite existing output folder'
-      TabOrder = 4
-    end
-    object AutostartCheckbox: TCheckBox
-      Left = 33
-      Top = 39
-      Width = 141
-      Height = 17
-      Caption = 'Auto start Clue-S'
-      Enabled = False
-      TabOrder = 1
-    end
-    object aboutButton: TButton
-      Left = 334
-      Top = 152
-      Width = 75
-      Height = 25
-      Anchors = [akTop, akRight]
-      Caption = 'About'
-      TabOrder = 10
-      OnClick = aboutButtonClick
     end
   end
   object arrowImages: TImageList
@@ -568,13 +559,13 @@ object ClueForm: TClueForm
   object domainsMenu: TPopupMenu
     AutoHotkeys = maManual
     Images = arrowImages
-    Left = 120
-    Top = 176
+    Left = 96
+    Top = 144
   end
   object georefsMenu: TPopupMenu
     AutoHotkeys = maManual
     Images = arrowImages
-    Left = 136
-    Top = 216
+    Left = 120
+    Top = 184
   end
 end

@@ -40,7 +40,6 @@ type
     historyCombobox: TComboBox;
     recentLabel: TLabel;
     overwriteCheckbox: TCheckBox;
-    AutostartCheckbox: TCheckBox;
     aboutButton: TButton;
     procedure Btn_CloseClick(Sender: TObject);
     procedure Btn_UpdateClick(Sender: TObject);
@@ -84,7 +83,27 @@ implementation
 uses
     Registry, ShellApi, ComObj,
     themes, styles, system.types, ioutils,
-    CluesConfig, about;
+    CluesConfig, about, TlHelp32;
+
+
+function ProcessCount(const ExeName: String): Integer;
+var
+  ContinueLoop: BOOL;
+  FSnapshotHandle: THandle;
+  FProcessEntry32: TProcessEntry32;
+begin
+  FSnapshotHandle:= CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  FProcessEntry32.dwSize:= SizeOf(FProcessEntry32);
+  ContinueLoop:= Process32First(FSnapshotHandle, FProcessEntry32);
+  Result:= 0;
+  while Integer(ContinueLoop) <> 0 do begin
+    if ((UpperCase(ExtractFileName(FProcessEntry32.szExeFile)) =
+      UpperCase(ExeName)) or (UpperCase(FProcessEntry32.szExeFile) =
+      UpperCase(ExeName))) then Inc(Result);
+    ContinueLoop:= Process32Next(FSnapshotHandle, FProcessEntry32);
+  end;
+  CloseHandle(FSnapshotHandle);
+end;
 
 procedure TClueForm.aboutButtonClick(Sender: TObject);
 var
@@ -153,6 +172,7 @@ var
     i : integer;
     szpos : string;
     parts : TStringList;
+    clueHandle : THandle;
 begin
     // theme related stuff
     styles := TStylemanager.StyleNames;
@@ -210,7 +230,13 @@ begin
         historyCombobox.Items.Add(config.history[i]); // add in reverse order
     historyCombobox.ItemIndex := 0;
 
-    if AutostartCheckbox.Checked then
+    if ProcessCount('clues.exe') > 0 then
+    begin
+        clueHandle := FindWindow(nil, 'Dyna-CLUE');
+        if clueHandle > 0 then
+            SetForegroundWindow(clueHandle);
+    end
+    else
         if FileExists(ExpandFileName(clueFolderEdit.Text) + '\clues.exe') then
             ShellExecute(Handle, 'open', PChar(ExpandFileName(clueFolderEdit.Text) + '\clues.exe'), nil, PChar(ExpandFileName(clueFolderEdit.Text)), SW_SHOWNORMAL) ;
 end;
@@ -283,8 +309,6 @@ begin
 
     updateFolderEdit(clueFolderEdit, folder);
     mainEventsActivate(cluefolderEdit);
-
-    AutostartCheckbox.Enabled := FileExists(ExpandFileName(clueFolderEdit.Text) + '\clues.exe');
 
 end;
 
@@ -394,10 +418,6 @@ begin
         config.item['OverwriteFolder'] := 'True'
     else
         config.item['OverwriteFolder'] := 'False';
-    if AutostartCheckbox.Checked then
-        config.item['AutostartClueS'] := 'True'
-    else
-        config.item['AutostartClueS'] := 'False';
 
     // save gui stuff
     config.item['WindowPosition'] := Format('%d,%d', [self.Top, self.Left]);
@@ -449,7 +469,6 @@ begin
     if (length(item) > 0) and DirectoryExists(item) then
     begin
         cluefolderEdit.Text := item;
-        AutostartCheckbox.Enabled := FileExists(ExpandFileName(clueFolderEdit.Text) + '\clues.exe');
     end;
     item := config.item['BaseDestinationFolder'];
     if (length(item) > 0) and DirectoryExists(item) then basefolderEdit.Text := item;
@@ -469,8 +488,6 @@ begin
 
     item := config.item['OverwriteFolder'];
     if length(item) > 0 then overwriteCheckbox.Checked := item = 'True';
-    item := config.item['AutostartClueS'];
-    if length(item) > 0 then AutostartCheckbox.Checked := item = 'True';
 
     item := config.item['Theme'];
     index := styleChooser.Items.IndexOf(item);

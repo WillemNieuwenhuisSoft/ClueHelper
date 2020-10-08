@@ -4,6 +4,7 @@ September 2020
 ## Introduction
 This software has been developed as a complementary software to the Clue-S modelling software (version 2.0, 2006).
 The helper software is added to manage the modelling output of the Clue-S software. The advantages:
+- It automatically starts the Clue-S modelling software or if already running activates it.
 - Organizes the output of the modelling in separate folders, one for each scenario output
 - Enables quickly running multiple scenarios, but clearing the last modelling output
 - Converts the modelling output to ILWIS format files as well.
@@ -27,7 +28,6 @@ The elements in the user interface:
 |Entry|Description|
 |:-----|:-----------|
 |Clue-S folder|The folder where the modelling software is stored; this folder also contains the ILWIS domain and georeferenced service objects that match the model dimensions and values. The small down arrow opens a menu from which the folder can be selected. Note the existence of an additional file called *cov_all.0.Copy*: this file is used as a template to recreate *cov_all.0* after each model run.|
-|Auto start Clue-S|When this box is checked the Clue-S software is also started when the helper software is started the next time.|
 |Base destination|This is the folder where all the modelling outputs will be stored in a subfolder for each scenario. The small down arrow opens a menu from which the folder can be selected.<p><p>**New folder**<br> You can create a new folder for this entry in two ways:<br>1. Type the name of the new folder, then click on the down arrow and select `<new>`. The folder is created and selected.<br>2. Add a new folder in the windows explorer. The new folder is added in the menu under the down arrow immediately and you can select it. In both cases the Start at entry is set to 1.|
 |Subfolder pattern|Define the pattern for the scenario subfolders. The pattern begins with a text part followed by a sequence of zeros. The text part will be taken as-is. The number of zeroes determines the number of digits ending up in the folder name. If no zeroes are included this number defaults to 5.<br>For example, the pattern scen_000 will result in folder names: scen_001, scen_002, etc.|
 |Start at|This sequence number is combined with the subfolder pattern and defines at what number the subfolder number part will start. At each start of the program this is calculated from the already existing scenario folders. For example, if the folders scen_00001, scen_00002 and scen_00003 already exist the start number will be set at 4.|

@@ -98,7 +98,7 @@ begin
         exit;
     end;
 
-    if not FileExists(ExpandFileName(ChangeFilePath('cov_all.0', sourceFolder))) then
+    if not FileExists(ExpandFileName(ChangeFilePath('cov_all.1', sourceFolder))) then
     begin
         // Not all file are available, stop
         moveScenarioFiles := false;
@@ -107,7 +107,8 @@ begin
 
     // make backup of original cov_all.0 file
     TFile.Copy(ExpandFileName(ChangeFilePath('cov_all.0', sourceFolder)),
-               ExpandFileName(ChangeFilePath('cov_all.0.Copy', sourceFolder)));
+               ExpandFileName(ChangeFilePath('cov_all.0.Copy', sourceFolder)),
+               true);       // overwrite if exists
 
     // get all the files from the source
     // and only move them if they are actual datafiles

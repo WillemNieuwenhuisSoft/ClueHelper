@@ -2579,9 +2579,9 @@ object aboutForm: TaboutForm
   end
   object aboutMemo: TMemo
     Left = 226
-    Top = 222
+    Top = 200
     Width = 185
-    Height = 89
+    Height = 111
     Alignment = taCenter
     Anchors = [akRight, akBottom]
     Lines.Strings = (

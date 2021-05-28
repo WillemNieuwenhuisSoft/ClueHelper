@@ -130,6 +130,8 @@
         <Icon_MainIcon>ClueS_Icon.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>clue_logo_44.jpg</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>clue_logo_150.jpg</UWP_DelphiLogo150>
+        <VerInfo_Build>4</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=Twente University;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.4;InternalName=Cluehelper;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=nl.utwente.itc.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

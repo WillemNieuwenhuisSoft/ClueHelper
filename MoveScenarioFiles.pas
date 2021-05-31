@@ -6,6 +6,7 @@ type
     TMoveScenarioFiles = class
 
 	private
+        _reason : integer;
         function createFolder(newFolder : string) : boolean;
 
 	public
@@ -13,6 +14,12 @@ type
 
         function moveScenarioFiles : boolean;
         procedure copyServiceObjects;
+
+        // resuly or failure reason:
+        //   0  = OK
+        //   10 = could not create destination folder
+        //   20 = miising file in source folder
+        property reason : integer read _reason;
 
     end;
 
@@ -50,6 +57,7 @@ type
 
 constructor TMoveScenarioFiles.Create;
 begin
+    _reason := 0;
     //
 end;
 
@@ -95,6 +103,7 @@ begin
     begin
         // Unable to create destination folder; moving files NOT initiated
         moveScenarioFiles := false;
+        _reason := 10;
         exit;
     end;
 
@@ -102,6 +111,7 @@ begin
     begin
         // Not all file are available, stop
         moveScenarioFiles := false;
+        _reason := 20;
         exit;
     end;
 

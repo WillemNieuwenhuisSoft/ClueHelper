@@ -52,8 +52,10 @@ begin
         status := 1 ; // not moved and not converted
         // move generated files
         mv := TMoveScenarioFiles.Create;
-        if not mv.moveScenarioFiles then
+        if not mv.moveScenarioFiles then begin
+            status := mv.reason;    // error code
             exit;
+        end;
 
         // copy ilwis service files
         mv.copyServiceObjects;

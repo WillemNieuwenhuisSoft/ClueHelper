@@ -11,6 +11,7 @@ object ClueForm: TClueForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   OnResize = FormResize
@@ -25,8 +26,6 @@ object ClueForm: TClueForm
     ParentShowHint = False
     ShowHint = False
     TabOrder = 1
-    ExplicitTop = 2
-    ExplicitHeight = 304
     DesignSize = (
       578
       283)
@@ -201,9 +200,9 @@ object ClueForm: TClueForm
       TabOrder = 7
     end
     object overwriteCheckbox: TCheckBox
-      Left = 33
+      Left = 24
       Top = 125
-      Width = 208
+      Width = 250
       Height = 17
       Caption = 'Overwrite existing output folder'
       TabOrder = 4
@@ -227,7 +226,6 @@ object ClueForm: TClueForm
     Align = alBottom
     TabOrder = 0
     OnResize = buttonPanelResize
-    ExplicitTop = 297
     object progressLabel: TLabel
       Left = 120
       Top = 8

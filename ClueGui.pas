@@ -53,6 +53,7 @@ type
     procedure patternEditExit(Sender: TObject);
     procedure aboutButtonClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormActivate(Sender: TObject);
   private
     TaskBarNative: ITaskBarList3;
     _ic : TImageConvertor;
@@ -240,6 +241,18 @@ begin
         if FileExists(ExpandFileName(clueFolderEdit.Text) + '\clues.exe') then
             ShellExecute(Handle, 'open', PChar(ExpandFileName(clueFolderEdit.Text) + '\clues.exe'), nil, PChar(ExpandFileName(clueFolderEdit.Text)), SW_SHOWNORMAL) ;
 end;
+
+procedure TClueForm.FormActivate(Sender: TObject);
+begin
+    // check if everything is visible
+    if aboutButton.Left < (overwriteCheckbox.Left + overwriteCheckbox.Width) then
+        self.Width := self.Width + (overwriteCheckbox.Left + overwriteCheckbox.Width) - aboutButton.Left + 10; // 10 small margin
+
+    if (historyCombobox.Top + historyCombobox.Height) > buttonPanel.Top then
+        self.Height := self.Height + (historyCombobox.Top + historyCombobox.Height) - buttonPanel.Top + 10; // 10 small margin
+
+end;
+
 
 // repopulate the folder lists and the files lists to account for external changes
 procedure TClueForm.mainEventsActivate(Sender: TObject);

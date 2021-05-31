@@ -377,8 +377,10 @@ begin
     config.nextFolder;
     populateFromConfig;
 
-    if Message.Result = 1 then ShowMessage('Error moving and converting files');
     if Message.Result = 2 then ShowMessage('Files successfully moved and converted');
+    if Message.Result = 1 then ShowMessage('Error moving and converting files');
+    if Message.Result = 10 then ShowMessage('Could not create folder in destination');
+    if Message.Result = 20 then ShowMessage('Missing files in source folder; did you run the simulation?');
 
 end;
 

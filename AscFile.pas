@@ -182,12 +182,15 @@ end;
 procedure TAscFile.loadMetadata(var ascfile : TBufferedFileStream);
 var
     unk : string;
+    format : TFormatSettings;
 begin
+    format.DecimalSeparator := '.';
+    format.ThousandSeparator := ',';
     _cols := StrToInt(nextMetaField(ascfile));
     _rows := StrToInt(nextMetaField(ascfile));
-    _left_X := StrToFloat(nextMetaField(ascfile));
-    _bottom_Y := StrToFloat(nextMetaField(ascfile));
-    _cellSize := StrToFloat(nextMetaField(ascfile));
+    _left_X := StrToFloat(nextMetaField(ascfile), format);
+    _bottom_Y := StrToFloat(nextMetaField(ascfile), format);
+    _cellSize := StrToFloat(nextMetaField(ascfile), format);
 
     // now try optional stuff
     unk := nextMetaField(ascfile);
@@ -255,8 +258,9 @@ begin
                 _buffer[row] := nextRow(ascfile);
 
         except
-            on EConvertError do
+            on EConvertError do begin
               ShowMessage('Integer number expected: does the ASC file contain floats?');
+            end;
         end;
     finally
         ascfile.Free;
